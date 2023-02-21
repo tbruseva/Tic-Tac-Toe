@@ -11,5 +11,6 @@ namespace Tic_Tac_Toe_Web_API.Models.Interfaces
         int MinPlayers { get; }
         string Name { get; set; }
         List<Player> Players { get; set; }
+        string ToJson();
     }
 }

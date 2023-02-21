@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Tic_Tac_Toe_Web_API.Enums;
 using Tic_Tac_Toe_Web_API.Models;
 using Tic_Tac_Toe_Web_API.Models.Interfaces;
 
@@ -23,7 +25,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var listAllGames = _gameManager.GetAllGames();
+                var listAllGames = _gameManager.GetAllGames();//.Select(g=>g.ToJson());
 
                 return StatusCode(200, listAllGames);
             }
@@ -40,7 +42,8 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             try
             {
                 var player = _playerManager.CreatePlayer(username);
-                var game = _gameManager.JoinGame(gameId, player);
+                var game = _gameManager.JoinGame(gameId, player).ToJson();
+                
                 return StatusCode(200, game);
             }
             catch (Exception ex)
@@ -49,7 +52,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             }
         }
 
-        [Route("SelectPlayer")]
+        [Route("SelectFirstOrSecondPlayer")]
         [HttpPost]
         public IActionResult SelectFirstOrSecondPlayer([FromHeader] string username, [FromBody] int gameId, string mark)
         {
@@ -64,38 +67,23 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             }
         }
 
-        //[Route("JoinGame")]
-        //[HttpPost]
-        //public IActionResult StartGame([FromBody] int gameId, [FromHeader] string username)
-        //{
-        //    try
-        //    {
-        //        var player = _playerManager.CreatePlayer(username);
-        //        var startedGame = _gameManager.StartGame(gameId, player);
-        //        return StatusCode(200, startedGame);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
 
-        //[Route("TicTacToe/MakeMove")]
-        //[HttpPost]
-        //public IActionResult MakeMove([FromHeader] int userId, int gameId, [FromBody] int rowPosition, int colPosition, )
-        //{
-        //    try
-        //    {
-        //        var player = _playerManager.GetPlayer(username);
-        //        //var move = _gameManager.MakeMove(id, player);
-        //        return StatusCode(200);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
+        [Route("TicTacToe/MakeMove")]
+        [HttpPost]
+        public IActionResult MakeMove([FromHeader] string username, int gameId, int rowPosition, int colPosition)
+        {
+            try
+            {
+                //var player = _playerManager.GetPlayer(username);
+                var move = _gameManager.MakeMove(gameId, username, rowPosition, colPosition);
+                return StatusCode(200);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
-        //}
+        }
 
     }
 }

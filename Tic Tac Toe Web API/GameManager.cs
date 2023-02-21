@@ -90,6 +90,10 @@ namespace Tic_Tac_Toe_Web_API
                     if (Enum.TryParse(playerMark, true, out selectedMark))
                     {
                         player.Mark = selectedMark;
+                        if (selectedMark == Mark.O)
+                        {
+                            game.Players[1].Mark = Mark.X;
+                        }
                     }
                     else
                     {
@@ -103,6 +107,20 @@ namespace Tic_Tac_Toe_Web_API
             }
 
             return player;
+        }
+
+        public IGame MakeMove(int gameId, string username, int rowPosition, int colPosition)
+        {
+            var game = GetGame(gameId);
+            if (game.Name == "Tic-Tac-Toe")
+            {
+                //game = (game as TicTacToeGame);
+                //if (game.MakeMove(player, rowPosition, colPosition)
+
+               (game as TicTacToeGame).MakeMove(username, rowPosition, colPosition);
+            }
+
+            return game;
         }
 
 
