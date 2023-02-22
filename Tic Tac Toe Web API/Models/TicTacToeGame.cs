@@ -6,17 +6,23 @@ using Tic_Tac_Toe_Web_API.Models.Interfaces;
 
 namespace Tic_Tac_Toe_Web_API.Models
 {
-    public class TicTacToeGame : IGame
+    public class TicTacToeGame : IGame, ITicTacToeGame
     {
-        public int Id { get; set; }
+        private static int _id;
+        public int Id { get; set; } = _id;
         public string Name { get; set; }
         public GameStatus GameStatus { get; set; }
         public List<Player> Players { get; set; } = new List<Player>();
         public int MinPlayers { get; } = 2;
         public int MaxPlayers { get; } = 2;
-        public Mark[,] Grid { get; set; } = new Mark[3, 3];
+        //public Mark[,] Grid { get; set; } = new Mark[3, 3];
+        public Mark[] Grid { get; set; } = new Mark[9];
         public Mark CurrentMark { get; set; } = Mark.X;
 
+        public TicTacToeGame()
+        {
+            ++_id;
+        }
         public void JoinGame(Player player)
         {
             if (this.GameStatus == GameStatus.NotStarted && this.Players.Count == 0)
@@ -40,12 +46,13 @@ namespace Tic_Tac_Toe_Web_API.Models
         public void MakeMove(string username, int rowPosition, int colPosition)
         {
             var mark = this.Players.Where(p => p.Name == username).FirstOrDefault().Mark;
+            var position = this.CalculatePosition(rowPosition, colPosition);
 
             if (CurrentMark == mark)
             {
-                if (Grid[rowPosition, colPosition] == Mark.None)
+                if (Grid[position] == Mark.None)
                 {
-                    Grid[rowPosition, colPosition] = mark;
+                    Grid[position] = mark;
                     if (this.CheckIfWin(mark))
                     {
                         GameStatus = GameStatus.Finished;
@@ -59,7 +66,7 @@ namespace Tic_Tac_Toe_Web_API.Models
             }
             else
             {
-            throw new Exception("It is not your turn to make move!");
+                throw new Exception("It is not your turn to make move!");
             }
         }
 
@@ -73,70 +80,34 @@ namespace Tic_Tac_Toe_Web_API.Models
                 player2 = this.Players[1],
                 currentMark = this.CurrentMark,
             };
-            
+
             return JsonConvert.SerializeObject(result);
         }
 
         private bool CheckIfWin(Mark mark)
         {
-            if (CheckRows(mark))
+            if ((Grid[0] == mark && Grid[1] == mark && Grid[2] == mark) ||
+        (Grid[3] == mark && Grid[4] == mark && Grid[5] == mark) ||
+        (Grid[6] == mark && Grid[7] == mark && Grid[8] == mark) ||
+        (Grid[0] == mark && Grid[3] == mark && Grid[6] == mark) ||
+        (Grid[1] == mark && Grid[4] == mark && Grid[7] == mark) ||
+        (Grid[2] == mark && Grid[5] == mark && Grid[8] == mark) ||
+        (Grid[0] == mark && Grid[4] == mark && Grid[8] == mark) ||
+        (Grid[2] == mark && Grid[4] == mark && Grid[6] == mark))
             {
                 return true;
             }
-            else if(CheckCols(mark)) 
-            {
-                return true;
-            }
-            else if(CheckDiagonals(mark)) 
-            {
-                return true;
-            }
 
             return false;
         }
 
-        private bool CheckRows(Mark mark)
+        private int CalculatePosition(int row, int col)
         {
-            for (int i = 0; i < Grid.GetLength(0); i++)
-            {
-                if (Grid[i, 0] == mark && Grid[i, 0] == Grid[i, 1] && Grid[i, 1] == Grid[i, 2])
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            var position = (row * 3) + col;
+            return position;
         }
 
-        private bool CheckCols(Mark mark)
-        {
-            for (int i = 0; i < Grid.GetLength(1); i++)
-            {
-                if (Grid[0, i] == mark && Grid[0, i] == Grid[1, i] && Grid[1, i] == Grid[2, i])
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private bool CheckDiagonals(Mark mark)
-        {
-            if (Grid[1, 1] == mark)
-            {
-                if (Grid[0, 0] == Grid[1, 1] && Grid[1, 1] == Grid[2, 2])
-                {
-                    return true;
-                }
-                else if (Grid[0, 2] == Grid[1, 1] && Grid[1, 1] == Grid[2, 0])
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
+        
         private void ChangePlayer()
         {
             if (CurrentMark == Mark.X)

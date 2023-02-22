@@ -11,7 +11,7 @@ namespace Tic_Tac_Toe_Web_API
 
         public GameManager()
         {
-            _allGames.Add(new TicTacToeGame() { Id = 1, Name = "Tic-Tac-Toe" });
+           
         }
 
         public List<IGame> GetAllGames()
@@ -19,7 +19,7 @@ namespace Tic_Tac_Toe_Web_API
             return _allGames;
         }
 
-        public IGame GetGame(int id)
+        public IGame GetGameById(int id)
         {
             var game = _allGames.Where(g => g.Id == id).FirstOrDefault();
             if (game == null)
@@ -32,6 +32,7 @@ namespace Tic_Tac_Toe_Web_API
         public IGame CreateGame()
         {
             var game = new TicTacToeGame();
+            _allGames.Add(game);
             return game;
         }
 
@@ -47,22 +48,22 @@ namespace Tic_Tac_Toe_Web_API
             }
         }
 
-        public IGame EnterGame(IGame game, Player player)
-        {
-            if (game.Players.Count < 1)
-            {
-                game.Players.Add(player);
-                game.GameStatus = GameStatus.WaitingForOpponent;
-                return game;
-            }
-            else
-            {
-                throw new Exception("Players should be less than 1 to enter the game!");
-            }
-        }
+        //public IGame EnterGame(IGame game, Player player)
+        //{
+        //    if (game.Players.Count < 1)
+        //    {
+        //        game.Players.Add(player);
+        //        game.GameStatus = GameStatus.WaitingForOpponent;
+        //        return game;
+        //    }
+        //    else
+        //    {
+        //        throw new Exception("Players should be less than 1 to enter the game!");
+        //    }
+        //}
         public IGame JoinGame(int gameId, Player player)
         {
-            var game = GetGame(gameId);
+            var game = GetGameById(gameId);
 
             if (game.Name == "Tic-Tac-Toe")
             {
@@ -74,7 +75,7 @@ namespace Tic_Tac_Toe_Web_API
 
         public Player SelectFirstOrSecondPlayer(int gameId, string username, string playerMark)
         {
-            var game = GetGame(gameId);
+            var game = GetGameById(gameId);
             var player = game.Players.Where(p => p.Name == username).FirstOrDefault();
 
             if (player == null)
@@ -111,7 +112,7 @@ namespace Tic_Tac_Toe_Web_API
 
         public IGame MakeMove(int gameId, string username, int rowPosition, int colPosition)
         {
-            var game = GetGame(gameId);
+            var game = GetGameById(gameId);
             if (game.Name == "Tic-Tac-Toe")
             {
                 //game = (game as TicTacToeGame);
