@@ -11,7 +11,7 @@ namespace Tic_Tac_Toe_Web_API
         public IGame CreateGame();
         public List<IGame> GetAllGames();
         public IGame GetGameById(int id);
-        public IGame JoinGame(int id, Player player);
+        public IGame JoinGame(int id, Player player, string mark);
         public Player SelectFirstOrSecondPlayer(int gameId, string username, string mark);
         public IGame MakeMove(int gameId, string username, int rowPosition, int colPosition);
        // public IGame StartGame(int id, Player player);

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Newtonsoft.Json;
+using System;
 using System.Numerics;
 using Tic_Tac_Toe_Web_API.Enums;
 using Tic_Tac_Toe_Web_API.Models.Interfaces;
@@ -8,27 +9,37 @@ namespace Tic_Tac_Toe_Web_API.Models
 {
     public class TicTacToeGame : IGame, ITicTacToeGame
     {
-        private static int _id;
-        public int Id { get; set; } = _id;
+        private static int uniqueId;
+        public int Id { get; set; }
         public string Name { get; set; }
         public GameStatus GameStatus { get; set; }
         public List<Player> Players { get; set; } = new List<Player>();
         public int MinPlayers { get; } = 2;
         public int MaxPlayers { get; } = 2;
-        //public Mark[,] Grid { get; set; } = new Mark[3, 3];
         public Mark[] Grid { get; set; } = new Mark[9];
         public Mark CurrentMark { get; set; } = Mark.X;
 
         public TicTacToeGame()
         {
-            ++_id;
+            Id = ++uniqueId;
+            Name = "Tic-Tac-Toe";
         }
-        public void JoinGame(Player player)
+        public void JoinGame(Player player, string mark)
         {
             if (this.GameStatus == GameStatus.NotStarted && this.Players.Count == 0)
             {
                 this.GameStatus = GameStatus.WaitingForOpponent;
+                if (string.IsNullOrWhiteSpace(mark))
+                {
                 player.Mark = Mark.X;
+                }
+                else
+                {
+                    Mark selectedMark;
+                    Enum.TryParse(mark, true, out selectedMark);
+                    player.Mark = selectedMark;
+                }
+
                 this.Players.Add(player);
             }
             else if (this.GameStatus == GameStatus.WaitingForOpponent && this.Players.Count == 1)

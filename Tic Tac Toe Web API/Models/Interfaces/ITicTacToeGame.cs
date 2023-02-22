@@ -6,14 +6,14 @@ namespace Tic_Tac_Toe_Web_API.Models.Interfaces
     {
         Mark CurrentMark { get; set; }
         GameStatus GameStatus { get; set; }
-        Mark[,] Grid { get; set; }
+        Mark[] Grid { get; set; } 
         int Id { get; set; }
         int MaxPlayers { get; }
         int MinPlayers { get; }
         string Name { get; set; }
         List<Player> Players { get; set; }
 
-        void JoinGame(Player player);
+        void JoinGame(Player player, string mark);
         void MakeMove(string username, int rowPosition, int colPosition);
         string ToJson();
     }

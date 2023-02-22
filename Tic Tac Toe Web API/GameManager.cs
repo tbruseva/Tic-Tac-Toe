@@ -61,13 +61,13 @@ namespace Tic_Tac_Toe_Web_API
         //        throw new Exception("Players should be less than 1 to enter the game!");
         //    }
         //}
-        public IGame JoinGame(int gameId, Player player)
+        public IGame JoinGame(int gameId, Player player, string mark)
         {
             var game = GetGameById(gameId);
 
             if (game.Name == "Tic-Tac-Toe")
             {
-                (game as TicTacToeGame).JoinGame(player);
+                (game as TicTacToeGame).JoinGame(player, mark);
             }
 
             return game;
