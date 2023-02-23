@@ -7,6 +7,16 @@ namespace Tic_Tac_Toe_Web_API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    policy =>
+                    {
+                        policy.WithOrigins("http://localhost:4200")
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    });
+            });
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -26,6 +36,7 @@ namespace Tic_Tac_Toe_Web_API
 
             app.UseHttpsRedirection();
 
+            app.UseCors();
             app.UseAuthorization();
 
 
