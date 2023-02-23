@@ -71,6 +71,7 @@ namespace Tic_Tac_Toe_Web_API.Models
                         GameStatus = GameStatus.Started;
                         Grid = new Mark[9];
                         CurrentMark = Mark.X;
+                        this.Players.Where(p => p.Mark == mark).FirstOrDefault().CounterWins++;
                     }
                 }
                 else
