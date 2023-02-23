@@ -125,18 +125,5 @@ namespace Tic_Tac_Toe_Web_API
         }
 
 
-        //public IGame MakeMove(int id)
-        //{
-        //    var game = GetGame(id);
-        //    if (game.Name == "TicTacToe")
-        //    {
-        //        TicTacToeGame.MakeMove(game);
-        //    }
-        //    else if (game.Name == Chess)
-        //    {
-
-        //    }
-        //    return game;
-        //}
     }
 }

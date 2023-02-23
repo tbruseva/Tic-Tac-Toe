@@ -64,11 +64,14 @@ namespace Tic_Tac_Toe_Web_API.Models
                 if (Grid[position] == Mark.None)
                 {
                     Grid[position] = mark;
+                    this.ChangePlayer();
+
                     if (this.CheckIfWin(mark))
                     {
-                        GameStatus = GameStatus.Finished;
+                        GameStatus = GameStatus.Started;
+                        Grid = new Mark[9];
+                        CurrentMark = Mark.X;
                     }
-                    this.ChangePlayer();
                 }
                 else
                 {

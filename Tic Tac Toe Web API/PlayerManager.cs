@@ -34,10 +34,10 @@ namespace Tic_Tac_Toe_Web_API
 
         public Player CreatePlayer(string username)
         {
-            //if (CheckPlayerExist(username))
-            //{
-            //    throw new InvalidOperationException("User with this username already exist! Please choose another name!");
-            //}
+            if (CheckPlayerExist(username))
+            {
+                throw new InvalidOperationException("User with this username already exist! Please choose another name!");
+            }
 
             var player = new Player();
             player.Name = username;
