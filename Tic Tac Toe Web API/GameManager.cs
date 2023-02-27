@@ -110,7 +110,7 @@ namespace Tic_Tac_Toe_Web_API
             return player;
         }
 
-        public void RestartGame(int gameId, string username)
+        public IGame RestartGame(int gameId, string username)
         {
             var game = GetGameById(gameId);
             foreach (var player in game.Players)
@@ -124,6 +124,7 @@ namespace Tic_Tac_Toe_Web_API
                     throw new UnauthorizedAccessException("Only game players can restart the game!");
                 }
             }
+            return game;
         }
         public IGame MakeMove(int gameId, string username, int rowPosition, int colPosition)
         {

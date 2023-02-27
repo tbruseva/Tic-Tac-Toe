@@ -88,6 +88,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             try
             {
                 var game = _gameManager.RestartGame(gameId, username);
+                return StatusCode(200, game);
             }
             catch (Exception)
             {
