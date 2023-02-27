@@ -80,5 +80,20 @@ namespace Tic_Tac_Toe_Web_API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [Route("RestartGame/{gameId}")]
+        [HttpPost]
+        public IActionResult RestartGame([FromRoute] int gameId, [FromHeader] string username)
+        {
+            try
+            {
+                var game = _gameManager.RestartGame(gameId, username);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
     }
 }

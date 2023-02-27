@@ -110,6 +110,21 @@ namespace Tic_Tac_Toe_Web_API
             return player;
         }
 
+        public void RestartGame(int gameId, string username)
+        {
+            var game = GetGameById(gameId);
+            foreach (var player in game.Players)
+            {
+                if (player.Name == username)
+                {
+                    (game as TicTacToeGame).RestartGame();
+                }
+                else
+                {
+                    throw new UnauthorizedAccessException("Only game players can restart the game!");
+                }
+            }
+        }
         public IGame MakeMove(int gameId, string username, int rowPosition, int colPosition)
         {
             var game = GetGameById(gameId);

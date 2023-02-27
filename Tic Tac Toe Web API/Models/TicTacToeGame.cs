@@ -45,7 +45,14 @@ namespace Tic_Tac_Toe_Web_API.Models
             else if (this.GameStatus == GameStatus.WaitingForOpponent && this.Players.Count == 1)
             {
                 this.GameStatus = GameStatus.Started;
+                if (this.Players[0].Mark == Mark.X)
+                {
                 player.Mark = Mark.O;
+                }
+                else if (this.Players[0].Mark == Mark.O)
+                {
+                    player.Mark = Mark.X;
+                }
                 this.Players.Add(player);
             }
             else
@@ -68,9 +75,7 @@ namespace Tic_Tac_Toe_Web_API.Models
 
                     if (this.CheckIfWin(mark))
                     {
-                        GameStatus = GameStatus.Started;
-                        Grid = new Mark[9];
-                        CurrentMark = Mark.X;
+                        GameStatus = GameStatus.Finished;
                         this.Players.Where(p => p.Mark == mark).FirstOrDefault().CounterWins++;
                     }
                 }
@@ -85,6 +90,12 @@ namespace Tic_Tac_Toe_Web_API.Models
             }
         }
 
+        public void RestartGame()
+        {
+            GameStatus = GameStatus.Started;
+            Grid = new Mark[9];
+            CurrentMark = Mark.X;
+        }
         public string ToJson()
         {
             var result = new
