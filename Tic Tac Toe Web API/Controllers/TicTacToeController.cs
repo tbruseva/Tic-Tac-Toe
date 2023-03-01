@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Tic_Tac_Toe_Web_API.Models.Interfaces;
 
 namespace Tic_Tac_Toe_Web_API.Controllers
@@ -35,7 +36,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         [Route("JoinGame/{gameId}")]
         [HttpPost]
-        public IActionResult JoinGame([FromRoute] int gameId, [FromHeader] string username, [FromBody] string? mark)
+        public IActionResult JoinGame([FromRoute] int gameId, [FromHeader] string username, [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] string? mark)
         {
             try
             {
@@ -72,7 +73,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var player = _gameManager.SelectFirstOrSecondPlayer(gameId, username, mark);
+                var player = _gameManager.SelectMark(gameId, username, mark);
                 return StatusCode(200, player);
             }
             catch (Exception ex)

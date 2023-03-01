@@ -73,7 +73,7 @@ namespace Tic_Tac_Toe_Web_API
             return game;
         }
 
-        public Player SelectFirstOrSecondPlayer(int gameId, string username, string playerMark)
+        public Player SelectMark(int gameId, string username, string playerMark)
         {
             var game = GetGameById(gameId);
             var player = game.Players.Where(p => p.Name == username).FirstOrDefault();

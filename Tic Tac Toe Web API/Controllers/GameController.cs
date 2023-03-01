@@ -59,7 +59,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var player = _gameManager.SelectFirstOrSecondPlayer(gameId, username, mark);
+                var player = _gameManager.SelectMark(gameId, username, mark);
                 return StatusCode(200, player);
             }
             catch (Exception ex)

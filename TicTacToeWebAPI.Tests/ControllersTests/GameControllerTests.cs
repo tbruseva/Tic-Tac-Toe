@@ -63,7 +63,7 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             Assert.IsInstanceOf<ObjectResult>(result);
 
             var okResult = result as ObjectResult;
-            Assert.AreEqual(games, okResult.Value);
+            Assert.That(okResult.Value, Is.EqualTo(games));
         }
 
         [Test]
@@ -82,7 +82,7 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             Assert.IsInstanceOf<ObjectResult>(result);
 
             var okResult = result as ObjectResult;
-            Assert.AreEqual(game, okResult.Value);
+            Assert.That(okResult.Value, Is.EqualTo(game));
 
         }
 
@@ -91,6 +91,7 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         {
             //Arrange
             int gameId = 1;
+            _gameManager.Setup(g => g.GetGameById(gameId)).Throws<Exception>();
 
             //Act
             var result = _controller.GetGameById(1);
@@ -111,7 +112,7 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             var mark = "O";
             var player = new Player {Name = "to", Mark = Tic_Tac_Toe_Web_API.Enums.Mark.O};
             var game = new TicTacToeGame { Id = 1, Name = "Tic-Tac-Toe", CurrentMark = Tic_Tac_Toe_Web_API.Enums.Mark.X, GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Grid = new Tic_Tac_Toe_Web_API.Enums.Mark[9], Players = new List<Player> { player } };
-            _gameManager.Setup(g => g.SelectFirstOrSecondPlayer(gameId, username, mark)).Returns(player);
+            _gameManager.Setup(g => g.SelectMark(gameId, username, mark)).Returns(player);
 
             //Act
             var result = _controller.SelectFirstOrSecondPlayer(username, gameId, mark);
@@ -121,7 +122,7 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             Assert.IsInstanceOf<ObjectResult>(result);
 
             var okResult = result as ObjectResult;
-            Assert.AreEqual(player, okResult.Value);
+            Assert.That(okResult.Value, Is.EqualTo(player));
         }
     }
 }
