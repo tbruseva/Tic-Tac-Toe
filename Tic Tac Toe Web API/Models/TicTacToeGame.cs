@@ -61,7 +61,7 @@ namespace Tic_Tac_Toe_Web_API.Models
 
             var position = this.CalculatePosition(rowPosition, colPosition);
 
-            if (currentPlayerId == player.Id)
+            if (currentPlayerId == player.Id && GameStatus == GameStatus.Started)
             {
                 var mark = GetMarkByPlayer(player.Id);
 
@@ -102,7 +102,7 @@ namespace Tic_Tac_Toe_Web_API.Models
             }
             else
             {
-                throw new Exception("It is not your turn to make move!");
+                throw new Exception("It is not your turn to make move or still waiting for opponent!");
             }
         }
 
