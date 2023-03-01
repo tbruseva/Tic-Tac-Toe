@@ -69,17 +69,16 @@ namespace Tic_Tac_Toe_Web_API
             return game;
         }
 
-        public Player SelectMark(int gameId, string username, string playerMark)
+        public IGame SelectMark(int gameId, int playerId, string playerMark)
         {
             var game = GetGameById(gameId);
-            var player = game.Players.Where(p => p.Name == username).FirstOrDefault();
 
             Mark selectedMark;
             Enum.TryParse(playerMark, true, out selectedMark);
 
-            (game as TicTacToeGame).SelectMark(player.Id, selectedMark);
+            (game as TicTacToeGame).SelectMark(playerId, selectedMark);
 
-            return player;
+            return game;
         }
 
         public IGame RestartGame(int gameId, string username)
@@ -98,7 +97,7 @@ namespace Tic_Tac_Toe_Web_API
             }
             return game;
         }
-        public IGame MakeMove(int gameId, string username, int rowPosition, int colPosition)
+        public IGame MakeMove(int gameId, int playerId, int rowPosition, int colPosition)
         {
             var game = GetGameById(gameId);
             if (game.Name == "Tic-Tac-Toe")
@@ -106,7 +105,7 @@ namespace Tic_Tac_Toe_Web_API
                 //game = (game as TicTacToeGame);
                 //if (game.MakeMove(player, rowPosition, colPosition)
 
-                (game as TicTacToeGame).MakeMove(username, rowPosition, colPosition);
+                (game as TicTacToeGame).MakeMove(playerId, rowPosition, colPosition);
             }
 
             return game;

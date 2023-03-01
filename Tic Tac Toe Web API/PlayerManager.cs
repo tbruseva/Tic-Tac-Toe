@@ -19,6 +19,19 @@ namespace Tic_Tac_Toe_Web_API
             throw new Exception("Player doesn't exist!");
         }
 
+        public Player GetPlayer(int playerId)
+        {
+            foreach (var player in players)
+            {
+                if (player.Id == playerId)
+                {
+                    return player;
+                }
+            }
+
+            throw new Exception("Player doesn't exist!");
+        }
+
         public bool CheckPlayerExist(string username)
         {
             foreach (var player in players)
@@ -41,7 +54,7 @@ namespace Tic_Tac_Toe_Web_API
 
             var player = new Player();
             player.Name = username;
-            //players.Add(player);
+            players.Add(player);
             return player;
         }
 

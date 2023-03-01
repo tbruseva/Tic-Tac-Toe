@@ -16,16 +16,15 @@ namespace Tic_Tac_Toe_Web_API.Models
         public int MinPlayers { get; } = 2;
         public int MaxPlayers { get; } = 2;
         public Mark[] Grid { get; set; } = new Mark[9];
-        public Mark CurrentMark { get; set; } = Mark.X;
-
-        public int CurrentPlayerIndex = 0;
-
-        public int PlayerXIndex = 0;
-        public int PlayerOIndex = 1;
-
         public int CounterWinX = 0;
         public int CounterWinO = 0;
         public int CounterDraw = 0;
+
+        private int CurrentPlayerIndex = 0;
+        private int PlayerXIndex = 0;
+        private int PlayerOIndex = 1;
+
+        
 
         public TicTacToeGame()
         {
@@ -51,9 +50,9 @@ namespace Tic_Tac_Toe_Web_API.Models
             }
         }
 
-        public void MakeMove(string username, int rowPosition, int colPosition)
+        public void MakeMove(int playerId, int rowPosition, int colPosition)
         {
-            var player = this.Players.Where(p => p.Name == username).FirstOrDefault();
+            var player = this.Players.Where(p => p.Id == playerId).FirstOrDefault();
             if (player == null)
             {
                 throw new UnauthorizedAccessException("Please join another game!");
@@ -69,7 +68,6 @@ namespace Tic_Tac_Toe_Web_API.Models
                 if (Grid[position] == Mark.None)
                 {
                     Grid[position] = mark;
-                    this.ChangePlayer();
 
                     if (this.CheckIfWin(mark))
                     {
@@ -122,17 +120,21 @@ namespace Tic_Tac_Toe_Web_API.Models
         {
             GameStatus = GameStatus.Started;
             Grid = new Mark[9];
-            CurrentMark = Mark.X;
+            CurrentPlayerIndex = 0;
         }
         public string ToJson()
         {
+            Player? playerX = Players.ElementAtOrDefault(PlayerXIndex) != null ? Players[PlayerXIndex] : null;
+            Player? playerO = Players.ElementAtOrDefault(PlayerOIndex) != null ? Players[PlayerOIndex] : null;
+            int? currentPlayerId = Players.ElementAtOrDefault(CurrentPlayerIndex) != null ? Players[CurrentPlayerIndex].Id : null;
+
             var result = new
             {
                 gameId = this.Id,
                 grid = this.Grid,
-                player1 = this.Players[0],
-                player2 = this.Players[1],
-                currentMark = this.CurrentMark,
+                playerX = playerX,
+                playerO = playerO,
+                currentPlayerId = currentPlayerId,
             };
 
             return JsonConvert.SerializeObject(result);
@@ -182,22 +184,7 @@ namespace Tic_Tac_Toe_Web_API.Models
                 throw new UnauthorizedAccessException("Only first player entered the game can select a mark!");
             }
         }
-        private void ChangePlayer()
-        {
-            if (CurrentMark == Mark.X)
-            {
-                CurrentMark = Mark.O;
-            }
-            else if (CurrentMark == Mark.O)
-            {
-                CurrentMark = Mark.X;
-            }
-            else
-            {
-                throw new Exception("Something went wrong!");
-            }
-
-        }
+        
 
 
     }

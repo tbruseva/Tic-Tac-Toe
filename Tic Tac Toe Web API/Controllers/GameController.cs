@@ -42,7 +42,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = _gameManager.GetGameById(gameId);
+                var game = _gameManager.GetGameById(gameId).ToJson();
 
                 return StatusCode(200, game);
             }
@@ -52,13 +52,28 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             }
         }
 
-        [Route("JoinGame/{gameId}")]
+        [Route("Player")]
         [HttpPost]
-        public IActionResult JoinGame([FromRoute] int gameId, [FromHeader] string username)
+        public IActionResult CreatePlayer([FromHeader] string username)
         {
             try
             {
                 var player = _playerManager.CreatePlayer(username);
+                return StatusCode(200, player);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Route("JoinGame/{gameId}")]
+        [HttpPost]
+        public IActionResult JoinGame([FromRoute] int gameId, [FromHeader] int playerId)
+        {
+            try
+            {
+                var player = _playerManager.GetPlayer(playerId);
                 var game = _gameManager.JoinGame(gameId, player);
 
                 return StatusCode(200, game);
@@ -75,7 +90,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = _gameManager.CreateGame();
+                var game = _gameManager.CreateGame().ToJson();
 
                 return StatusCode(200, game);
             }
