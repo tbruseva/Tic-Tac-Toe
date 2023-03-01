@@ -4,10 +4,9 @@ using System;
 using System.Numerics;
 using Tic_Tac_Toe_Web_API.Enums;
 using Tic_Tac_Toe_Web_API.Models.Interfaces;
-
 namespace Tic_Tac_Toe_Web_API.Models
 {
-    public class TicTacToeGame : IGame, ITicTacToeGame
+    public class TicTacToeGame : IGame
     {
         private static int uniqueId;
         public int Id { get; set; }
@@ -19,40 +18,31 @@ namespace Tic_Tac_Toe_Web_API.Models
         public Mark[] Grid { get; set; } = new Mark[9];
         public Mark CurrentMark { get; set; } = Mark.X;
 
+        public int CurrentPlayerIndex = 0;
+
+        public int PlayerXIndex = 0;
+        public int PlayerOIndex = 1;
+
+        public int CounterWinX = 0;
+        public int CounterWinO = 0;
+        public int CounterDraw = 0;
+
         public TicTacToeGame()
         {
             Id = ++uniqueId;
             Name = "Tic-Tac-Toe";
         }
-        public void JoinGame(Player player, string mark)
+
+        public void JoinGame(Player player)
         {
             if (this.GameStatus == GameStatus.NotStarted && this.Players.Count == 0)
             {
                 this.GameStatus = GameStatus.WaitingForOpponent;
-                if (string.IsNullOrWhiteSpace(mark))
-                {
-                player.Mark = Mark.X;
-                }
-                else
-                {
-                    Mark selectedMark;
-                    Enum.TryParse(mark, true, out selectedMark);
-                    player.Mark = selectedMark;
-                }
-
                 this.Players.Add(player);
             }
             else if (this.GameStatus == GameStatus.WaitingForOpponent && this.Players.Count == 1)
             {
                 this.GameStatus = GameStatus.Started;
-                if (this.Players[0].Mark == Mark.X)
-                {
-                player.Mark = Mark.O;
-                }
-                else if (this.Players[0].Mark == Mark.O)
-                {
-                    player.Mark = Mark.X;
-                }
                 this.Players.Add(player);
             }
             else
@@ -63,11 +53,19 @@ namespace Tic_Tac_Toe_Web_API.Models
 
         public void MakeMove(string username, int rowPosition, int colPosition)
         {
-            var mark = this.Players.Where(p => p.Name == username).FirstOrDefault().Mark;
+            var player = this.Players.Where(p => p.Name == username).FirstOrDefault();
+            if (player == null)
+            {
+                throw new UnauthorizedAccessException("Please join another game!");
+            }
+            var currentPlayerId = this.Players[CurrentPlayerIndex].Id;
+
             var position = this.CalculatePosition(rowPosition, colPosition);
 
-            if (CurrentMark == mark)
+            if (currentPlayerId == player.Id)
             {
+                var mark = GetMarkByPlayer(player.Id);
+
                 if (Grid[position] == Mark.None)
                 {
                     Grid[position] = mark;
@@ -76,18 +74,48 @@ namespace Tic_Tac_Toe_Web_API.Models
                     if (this.CheckIfWin(mark))
                     {
                         GameStatus = GameStatus.Finished;
-                        this.Players.Where(p => p.Mark == mark).FirstOrDefault().CounterWins++;
+                        if (mark == Mark.X)
+                        {
+                            CounterWinX++;
+                        }
+                        else if (mark == Mark.O)
+                        {
+                            CounterWinO++;
+                        }
+                    }
+                    else if (!Grid.Contains(Mark.None))
+                    {
+                        CounterDraw++;
                     }
                 }
                 else
                 {
                     throw new Exception("Cell is already marked, please choose another cell!");
                 }
+                
+                if (CurrentPlayerIndex == 0) 
+                { 
+                    CurrentPlayerIndex = 1; 
+                }
+                else if(CurrentPlayerIndex == 1)
+                {
+                    CurrentPlayerIndex = 0;
+                }
             }
             else
             {
                 throw new Exception("It is not your turn to make move!");
             }
+        }
+
+        private Mark GetMarkByPlayer(int playerId)
+        {
+            if (Players[PlayerXIndex].Id == playerId)
+            {
+                return Mark.X;
+            }
+
+            return Mark.O;
         }
 
         public void RestartGame()
@@ -133,7 +161,27 @@ namespace Tic_Tac_Toe_Web_API.Models
             return position;
         }
 
-        
+        public void SelectMark(int playerId, Mark mark)
+        {
+            if (mark != Mark.X && mark != Mark.O)
+            {
+                throw new InvalidDataException("Entered symbol is not valid! Please select X or O !");
+            }
+            if (!Players.Exists(p => p.Id == playerId))
+            {
+                throw new UnauthorizedAccessException("Please enter the game first!");
+            }
+
+            if (Players[0].Id == playerId)
+            {
+                this.PlayerXIndex = mark == Mark.X ? 0 : 1;
+                this.PlayerOIndex = mark == Mark.X ? 1 : 0;
+            }
+            else if (Players[1].Id == playerId)
+            {
+                throw new UnauthorizedAccessException("Only first player entered the game can select a mark!");
+            }
+        }
         private void ChangePlayer()
         {
             if (CurrentMark == Mark.X)

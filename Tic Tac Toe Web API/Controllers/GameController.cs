@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 using Tic_Tac_Toe_Web_API.Enums;
 using Tic_Tac_Toe_Web_API.Models;
@@ -51,16 +52,16 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             }
         }
 
-        
-
-        [Route("SelectFirstOrSecondPlayer")]
+        [Route("JoinGame/{gameId}")]
         [HttpPost]
-        public IActionResult SelectFirstOrSecondPlayer([FromHeader] string username, [FromBody] int gameId, string mark)
+        public IActionResult JoinGame([FromRoute] int gameId, [FromHeader] string username)
         {
             try
             {
-                var player = _gameManager.SelectMark(gameId, username, mark);
-                return StatusCode(200, player);
+                var player = _playerManager.CreatePlayer(username);
+                var game = _gameManager.JoinGame(gameId, player);
+
+                return StatusCode(200, game);
             }
             catch (Exception ex)
             {
@@ -68,6 +69,21 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             }
         }
 
+        [Route("CreateGame")]
+        [HttpPost]
+        public IActionResult CreateGame()
+        {
+            try
+            {
+                var game = _gameManager.CreateGame();
+
+                return StatusCode(200, game);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
     }
 }

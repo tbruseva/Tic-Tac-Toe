@@ -18,39 +18,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             _playerManager = playerManager;
         }
 
-        [Route("CreateGame")]
-        [HttpPost]
-        public IActionResult CreateGame()
-        {
-            try
-            {
-                var game = _gameManager.CreateGame();
-
-                return StatusCode(200, game);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [Route("JoinGame/{gameId}")]
-        [HttpPost]
-        public IActionResult JoinGame([FromRoute] int gameId, [FromHeader] string username, [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] string? mark)
-        {
-            try
-            {
-                var player = _playerManager.CreatePlayer(username);
-                var game = _gameManager.JoinGame(gameId, player, mark);
-
-                return StatusCode(200, game);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
+    
         [Route("MakeMove")]
         [HttpPost]
         public IActionResult MakeMove([FromHeader] string username, int gameId, int rowPosition, int colPosition)
@@ -67,9 +35,9 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         }
 
-        [Route("SelectFirstOrSecondPlayer/{gameId}")]
+        [Route("SelectMark/{gameId}")]
         [HttpPost]
-        public IActionResult SelectFirstOrSecondPlayer([FromRoute] int gameId, [FromHeader] string username, [FromBody] string mark)
+        public IActionResult SelectMark([FromRoute] int gameId, [FromHeader] string username, [FromBody] string mark)
         {
             try
             {

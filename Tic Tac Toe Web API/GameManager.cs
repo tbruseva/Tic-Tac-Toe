@@ -11,7 +11,7 @@ namespace Tic_Tac_Toe_Web_API
 
         public GameManager()
         {
-           
+
         }
 
         public List<IGame> GetAllGames()
@@ -36,17 +36,17 @@ namespace Tic_Tac_Toe_Web_API
             return game;
         }
 
-        public void AddPlayer(IGame game, Player player)
-        {
-            if (game.Players.Count < game.MaxPlayers)
-            {
-                game.Players.Add(player);
-            }
-            else
-            {
-                throw new Exception("Maximum number of players is reached! Please try again later!");
-            }
-        }
+        //public void AddPlayer(IGame game, Player player)
+        //{
+        //    if (game.Players.Count < game.MaxPlayers)
+        //    {
+        //        game.Players.Add(player);
+        //    }
+        //    else
+        //    {
+        //        throw new Exception("Maximum number of players is reached! Please try again later!");
+        //    }
+        //}
 
         //public IGame EnterGame(IGame game, Player player)
         //{
@@ -61,14 +61,10 @@ namespace Tic_Tac_Toe_Web_API
         //        throw new Exception("Players should be less than 1 to enter the game!");
         //    }
         //}
-        public IGame JoinGame(int gameId, Player player, string mark)
+        public IGame JoinGame(int gameId, Player player)
         {
             var game = GetGameById(gameId);
-
-            if (game.Name == "Tic-Tac-Toe")
-            {
-                (game as TicTacToeGame).JoinGame(player, mark);
-            }
+            game.JoinGame(player);
 
             return game;
         }
@@ -78,34 +74,10 @@ namespace Tic_Tac_Toe_Web_API
             var game = GetGameById(gameId);
             var player = game.Players.Where(p => p.Name == username).FirstOrDefault();
 
-            if (player == null)
-            {
-                throw new UnauthorizedAccessException("Please enter the game first!");
-            }
+            Mark selectedMark;
+            Enum.TryParse(playerMark, true, out selectedMark);
 
-            if (game.Name == "Tic-Tac-Toe")
-            {
-                if (game.Players[0].Name == username)
-                {
-                    Mark selectedMark;
-                    if (Enum.TryParse(playerMark, true, out selectedMark))
-                    {
-                        player.Mark = selectedMark;
-                        if (selectedMark == Mark.O)
-                        {
-                            game.Players[1].Mark = Mark.X;
-                        }
-                    }
-                    else
-                    {
-                        throw new InvalidDataException("Entered symbol is not valid! Please select X or O !");
-                    }
-                }
-                else if (game.Players[1].Name == username)
-                {
-                    throw new UnauthorizedAccessException("Only first player entered the game can select a mark!");
-                }
-            }
+            (game as TicTacToeGame).SelectMark(player.Id, selectedMark);
 
             return player;
         }
@@ -134,7 +106,7 @@ namespace Tic_Tac_Toe_Web_API
                 //game = (game as TicTacToeGame);
                 //if (game.MakeMove(player, rowPosition, colPosition)
 
-               (game as TicTacToeGame).MakeMove(username, rowPosition, colPosition);
+                (game as TicTacToeGame).MakeMove(username, rowPosition, colPosition);
             }
 
             return game;
