@@ -1,3 +1,5 @@
+using Tic_Tac_Toe_Web_API.Models.Mappers;
+
 namespace Tic_Tac_Toe_Web_API
 {
     public class Program
@@ -23,7 +25,8 @@ namespace Tic_Tac_Toe_Web_API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddSingleton<IGameManager, GameManager>();    
-            builder.Services.AddSingleton<IPlayerManager, PlayerManager>();    
+            builder.Services.AddSingleton<IPlayerManager, PlayerManager>();
+            builder.Services.AddScoped<GameMapper>();
 
             var app = builder.Build();
 

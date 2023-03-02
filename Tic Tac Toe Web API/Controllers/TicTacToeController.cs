@@ -25,7 +25,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = _gameManager.MakeMove(gameId, playerId, rowPosition, colPosition).ToJson();
+                var game = _gameManager.MakeMove(gameId, playerId, rowPosition, colPosition);
                 return StatusCode(200, game);
             }
             catch (Exception ex)
@@ -41,7 +41,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = _gameManager.SelectMark(gameId, playerId, mark).ToJson();
+                var game = _gameManager.SelectMark(gameId, playerId, mark);
                 return StatusCode(200, game);
             }
             catch (Exception ex)
@@ -56,7 +56,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = _gameManager.RestartGame(gameId, username).ToJson();
+                var game = _gameManager.RestartGame(gameId, username);
                 return StatusCode(200, game);
             }
             catch (Exception)

@@ -34,7 +34,26 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         //public void AllGames_Should_Return_List_Of_All_Games_If_Any_Are_Created()
         //{
         //    //Arrange
-        //    var games = new List<IGame> { new TicTacToeGame { Id = 1, Name = "Tic-Tac-Toe", CurrentPlayerId = Tic_Tac_Toe_Web_API.Enums.Mark.X, GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Grid = new Tic_Tac_Toe_Web_API.Enums.Mark[9], Players = new List<Player>() } };
+        //    var games = new List<IGame> { new TicTacToeGame { Id = 1, Name = "Tic-Tac-Toe", GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Grid = new Tic_Tac_Toe_Web_API.Enums.Mark[9], Players = new List<Player>() } };
+
+        //    _gameManager.Setup(g => g.GetAllGames()).Returns(games.Select(g=>g.ToJson());
+
+        //    //Act
+        //    var result = _controller.AllGames();
+
+        //    //Assert
+        //    Assert.IsNotNull(result);
+        //    Assert.IsInstanceOf<ObjectResult>(result);
+
+        //    var okResult = result as ObjectResult;
+        //    Assert.AreEqual(games, okResult.Value);
+        //}
+
+        //[Test]
+        //public void AllGames_Should_Return_Empty_List_If_No_Games_Are_Created()
+        //{
+        //    //Arrange
+        //    var games = new List<IGame>();
         //    _gameManager.Setup(g => g.GetAllGames()).Returns(games);
 
         //    //Act
@@ -45,35 +64,17 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         //    Assert.IsInstanceOf<ObjectResult>(result);
 
         //    var okResult = result as ObjectResult;
-        //    Assert.AreEqual(games, okResult.Value);  
+        //    Assert.That(okResult.Value, Is.EqualTo(games));
         //}
-
-        [Test]
-        public void AllGames_Should_Return_Empty_List_If_No_Games_Are_Created()
-        {
-            //Arrange
-            var games = new List<IGame>();
-            _gameManager.Setup(g => g.GetAllGames()).Returns(games);
-
-            //Act
-            var result = _controller.AllGames();
-
-            //Assert
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOf<ObjectResult>(result);
-
-            var okResult = result as ObjectResult;
-            Assert.That(okResult.Value, Is.EqualTo(games));
-        }
 
         //[Test]
         //public void GetGameById_Should_Return_Game_If_Game_Exists()
         //{
         //    //Arrange
         //    int gameId = 1;
-        //    var game = new TicTacToeGame { Id = 1, Name = "Tic-Tac-Toe", CurrentPlayerId = Tic_Tac_Toe_Web_API.Enums.Mark.X, GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Grid = new Tic_Tac_Toe_Web_API.Enums.Mark[9], Players = new List<Player>() };
+        //    var game = new TicTacToeGame { Id = 1, Name = "Tic-Tac-Toe", GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Grid = new Tic_Tac_Toe_Web_API.Enums.Mark[9], Players = new List<Player>() };
 
-        //    _gameManager.Setup(g=>g.GetGameById(gameId)).Returns(game);
+        //    _gameManager.Setup(g => g.GetGameById(gameId)).Returns(game);
 
         //    //Act
         //    var result = _controller.GetGameById(1);

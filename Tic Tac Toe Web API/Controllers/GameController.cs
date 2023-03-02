@@ -26,7 +26,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var listAllGames = _gameManager.GetAllGames();//.Select(g=>g.ToJson());
+                var listAllGames = _gameManager.GetAllGames();
 
                 return StatusCode(200, listAllGames);
             }
@@ -42,7 +42,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = _gameManager.GetGameById(gameId).ToJson();
+                var game = _gameManager.GetGameById(gameId);
 
                 return StatusCode(200, game);
             }
@@ -90,7 +90,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = _gameManager.CreateGame().ToJson();
+                var game = _gameManager.CreateGame();
 
                 return StatusCode(200, game);
             }

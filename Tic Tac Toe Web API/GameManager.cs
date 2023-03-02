@@ -2,26 +2,29 @@
 using Tic_Tac_Toe_Web_API.Models;
 using Tic_Tac_Toe_Web_API.Enums;
 using System.Numerics;
+using Tic_Tac_Toe_Web_API.Models.Dtos;
+using Tic_Tac_Toe_Web_API.Models.Mappers;
 
 namespace Tic_Tac_Toe_Web_API
 {
     public class GameManager : IGameManager
     {
         private List<IGame> _allGames = new List<IGame>();
+        private readonly GameMapper _gameMapper;
 
         public GameManager()
         {
-
+            _gameMapper= new GameMapper();
         }
 
-        public List<IGame> GetAllGames()
+        public List<GameResponseDto> GetAllGames()
         {
-            return _allGames;
+            return _allGames.Select(g => _gameMapper.ConvertToResponseDto(g)).ToList();
         }
 
-        public IGame GetGameById(int id)
+        public GameResponseDto GetGameById(int id)
         {
-            var game = _allGames.Where(g => g.Id == id).FirstOrDefault();
+            var game = _allGames.Where(g => g.Id == id).Select(g=> _gameMapper.ConvertToResponseDto(g)).FirstOrDefault();
             if (game == null)
             {
                 throw new Exception("Game doesn't exist!");
@@ -29,61 +32,42 @@ namespace Tic_Tac_Toe_Web_API
             return game;
         }
 
-        public IGame CreateGame()
+
+        public GameResponseDto CreateGame()
         {
             var game = new TicTacToeGame();
             _allGames.Add(game);
-            return game;
+            var gameResponseDto = _gameMapper.ConvertToResponseDto(game);
+            return gameResponseDto;
         }
 
-        //public void AddPlayer(IGame game, Player player)
-        //{
-        //    if (game.Players.Count < game.MaxPlayers)
-        //    {
-        //        game.Players.Add(player);
-        //    }
-        //    else
-        //    {
-        //        throw new Exception("Maximum number of players is reached! Please try again later!");
-        //    }
-        //}
-
-        //public IGame EnterGame(IGame game, Player player)
-        //{
-        //    if (game.Players.Count < 1)
-        //    {
-        //        game.Players.Add(player);
-        //        game.GameStatus = GameStatus.WaitingForOpponent;
-        //        return game;
-        //    }
-        //    else
-        //    {
-        //        throw new Exception("Players should be less than 1 to enter the game!");
-        //    }
-        //}
-        public IGame JoinGame(int gameId, Player player)
+        public GameResponseDto JoinGame(int gameId, Player player)
         {
-            var game = GetGameById(gameId);
+            var game = GetGame(gameId);
             game.JoinGame(player);
+            var gameResponseDto = _gameMapper.ConvertToResponseDto(game);
 
-            return game;
+            return gameResponseDto;
         }
 
-        public IGame SelectMark(int gameId, int playerId, string playerMark)
+
+        public GameResponseDto SelectMark(int gameId, int playerId, string playerMark)
         {
-            var game = GetGameById(gameId);
+            var game = GetGame(gameId);
 
             Mark selectedMark;
             Enum.TryParse(playerMark, true, out selectedMark);
 
             (game as TicTacToeGame).SelectMark(playerId, selectedMark);
 
-            return game;
+            var gameResponseDto = _gameMapper.ConvertToResponseDto(game);
+
+            return gameResponseDto;
         }
 
-        public IGame RestartGame(int gameId, string username)
+        public GameResponseDto RestartGame(int gameId, string username)
         {
-            var game = GetGameById(gameId);
+            var game = GetGame(gameId);
             foreach (var player in game.Players)
             {
                 if (player.Name == username)
@@ -95,11 +79,15 @@ namespace Tic_Tac_Toe_Web_API
                     throw new UnauthorizedAccessException("Only game players can restart the game!");
                 }
             }
-            return game;
+
+            var gameResponseDto = _gameMapper.ConvertToResponseDto(game);
+
+            return gameResponseDto;
         }
-        public IGame MakeMove(int gameId, int playerId, int rowPosition, int colPosition)
+
+        public GameResponseDto MakeMove(int gameId, int playerId, int rowPosition, int colPosition)
         {
-            var game = GetGameById(gameId);
+            var game = GetGame(gameId);
             if (game.Name == "Tic-Tac-Toe")
             {
                 //game = (game as TicTacToeGame);
@@ -108,9 +96,21 @@ namespace Tic_Tac_Toe_Web_API
                 (game as TicTacToeGame).MakeMove(playerId, rowPosition, colPosition);
             }
 
-            return game;
+            var gameResponseDto = _gameMapper.ConvertToResponseDto(game);
+
+            return gameResponseDto;
         }
 
-
+        #region Private methods
+        private IGame GetGame(int id)
+        {
+            var game = _allGames.Where(g => g.Id == id).FirstOrDefault();
+            if (game == null)
+            {
+                throw new Exception("Game doesn't exist!");
+            }
+            return game;
+        }
+        #endregion
     }
 }

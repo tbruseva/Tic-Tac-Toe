@@ -5,13 +5,13 @@ namespace Tic_Tac_Toe_Web_API.Models.Interfaces
 {
     public interface IGame
     {
-        GameStatus GameStatus { get; set; }
-        int Id { get; set; }
-        int MaxPlayers { get; }
-        int MinPlayers { get; }
-        string Name { get; set; }
-        List<Player> Players { get; set; }
-        void JoinGame(Player player);
-        string ToJson();
+        public GameStatus GameStatus { get; set; }
+        public int Id { get; set; }
+        public int MaxPlayers { get; }
+        public int MinPlayers { get; }
+        public string Name { get; set; }
+        public List<Player> Players { get; set; }
+        public void JoinGame(Player player);
+        public string ToJson();
     }
 }
