@@ -19,12 +19,11 @@ namespace Tic_Tac_Toe_Web_API.Models
         public int CounterWinX = 0;
         public int CounterWinO = 0;
         public int CounterDraw = 0;
+        public int CurrentPlayerIndex = 0;
+        public int PlayerXIndex = 0;
+        public int PlayerOIndex = 1;
 
-        private int CurrentPlayerIndex = 0;
-        private int PlayerXIndex = 0;
-        private int PlayerOIndex = 1;
 
-        
 
         public TicTacToeGame()
         {
@@ -90,12 +89,12 @@ namespace Tic_Tac_Toe_Web_API.Models
                 {
                     throw new Exception("Cell is already marked, please choose another cell!");
                 }
-                
-                if (CurrentPlayerIndex == 0) 
-                { 
-                    CurrentPlayerIndex = 1; 
+
+                if (CurrentPlayerIndex == 0)
+                {
+                    CurrentPlayerIndex = 1;
                 }
-                else if(CurrentPlayerIndex == 1)
+                else if (CurrentPlayerIndex == 1)
                 {
                     CurrentPlayerIndex = 0;
                 }
@@ -184,7 +183,7 @@ namespace Tic_Tac_Toe_Web_API.Models
                 throw new UnauthorizedAccessException("Only first player entered the game can select a mark!");
             }
         }
-        
+
 
 
     }
