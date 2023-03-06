@@ -156,7 +156,7 @@ namespace Tic_Tac_Toe_Web_API.Models
                 throw new UnauthorizedAccessException("Please enter the game first!");
             }
 
-            if (Players[0].Id == playerId)
+            if (Players[0].Id == playerId && GameStatus == GameStatus.WaitingForOpponent)
             {
                 this.PlayerXIndex = mark == Mark.X ? 0 : 1;
                 this.PlayerOIndex = mark == Mark.X ? 1 : 0;
