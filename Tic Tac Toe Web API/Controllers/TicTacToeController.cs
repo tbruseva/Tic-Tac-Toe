@@ -10,22 +10,37 @@ namespace Tic_Tac_Toe_Web_API.Controllers
     public class TicTacToeController : ControllerBase
     {
         private IGameManager _gameManager;
-        private IPlayerManager _playerManager;
+        //private IPlayerManager _playerManager;
 
         public TicTacToeController(IGameManager gameManager, IPlayerManager playerManager)
         {
             _gameManager = gameManager;
-            _playerManager = playerManager;
+            //_playerManager = playerManager;
         }
 
-    
+        [Route("{gameId}")]
+        [HttpGet]
+        public IActionResult GetGameById([FromRoute] int gameId)
+        {
+            try
+            {
+                var game = _gameManager.GetGameById(gameId);
+
+                return StatusCode(200, game);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [Route("MakeMove")]
         [HttpPost]
         public IActionResult MakeMove([FromHeader] int playerId, int gameId, int rowPosition, int colPosition)
         {
             try
             {
-                var game = _gameManager.MakeMove(gameId, playerId, rowPosition, colPosition);
+                var game = _gameManager.TicTacToeMakeMove(gameId, playerId, rowPosition, colPosition);
                 return StatusCode(200, game);
             }
             catch (Exception ex)
@@ -41,7 +56,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = _gameManager.SelectMark(gameId, playerId, mark);
+                var game = _gameManager.TicTacToeSelectMark(gameId, playerId, mark);
                 return StatusCode(200, game);
             }
             catch (Exception ex)
@@ -56,7 +71,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = _gameManager.RestartGame(gameId, username);
+                var game = _gameManager.TicTacToeRestartGame(gameId, username);
                 return StatusCode(200, game);
             }
             catch (Exception)

@@ -3,11 +3,11 @@ using Tic_Tac_Toe_Web_API.Models.Interfaces;
 
 namespace Tic_Tac_Toe_Web_API.Models.Mappers
 {
-    public class GameMapper
+    public class AllGamesMapper
     {
-        public GameResponseDto ConvertToResponseDto(IGame game)
+        public AllGamesResponseDto ConvertToResponseDto(IGame game)
         {
-            var response = new GameResponseDto();
+            var response = new AllGamesResponseDto();
             response.GameId = game.Id;
             response.GameName = game.Name;
             response.GameStatus = game.GameStatus;

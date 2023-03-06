@@ -87,22 +87,22 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
 
         //}
 
-        [Test]
-        public void GetGameById_Should_Catch_Exception_If_Game_Doesnot_Exists()
-        {
-            //Arrange
-            int gameId = 1;
-            _gameManager.Setup(g => g.GetGameById(gameId)).Throws<Exception>();
+        //[Test]
+        //public void GetGameById_Should_Catch_Exception_If_Game_Doesnot_Exists()
+        //{
+        //    //Arrange
+        //    int gameId = 1;
+        //    _gameManager.Setup(g => g.GetGameById(gameId)).Throws<Exception>();
 
-            //Act
-            var result = _controller.GetGameById(1);
+        //    //Act
+        //    var result = _controller.GetGameById(1);
 
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOf<ObjectResult>(result);
+        //    Assert.IsNotNull(result);
+        //    Assert.IsInstanceOf<ObjectResult>(result);
 
-            var okResult = result as ObjectResult;
-            Assert.IsInstanceOf<BadRequestObjectResult>(result);
-        }
+        //    var okResult = result as ObjectResult;
+        //    Assert.IsInstanceOf<BadRequestObjectResult>(result);
+        //}
 
         //[Test]
         //public void SelectFirstOrSecondPlayer_Should_Return_Updated_Player_Details()

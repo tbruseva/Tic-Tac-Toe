@@ -2,7 +2,7 @@
 
 namespace Tic_Tac_Toe_Web_API.Models.Dtos
 {
-    public class GameResponseDto
+    public class AllGamesResponseDto
     {
         public int GameId { get; set; }
         public string GameName { get; set; }

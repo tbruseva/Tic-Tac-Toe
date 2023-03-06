@@ -121,23 +121,6 @@ namespace Tic_Tac_Toe_Web_API.Models
             Grid = new Mark[9];
             CurrentPlayerIndex = 0;
         }
-        public string ToJson()
-        {
-            Player? playerX = Players.ElementAtOrDefault(PlayerXIndex) != null ? Players[PlayerXIndex] : null;
-            Player? playerO = Players.ElementAtOrDefault(PlayerOIndex) != null ? Players[PlayerOIndex] : null;
-            int? currentPlayerId = Players.ElementAtOrDefault(CurrentPlayerIndex) != null ? Players[CurrentPlayerIndex].Id : null;
-
-            var result = new
-            {
-                gameId = this.Id,
-                grid = this.Grid,
-                playerX = playerX,
-                playerO = playerO,
-                currentPlayerId = currentPlayerId,
-            };
-
-            return JsonConvert.SerializeObject(result);
-        }
 
         private bool CheckIfWin(Mark mark)
         {

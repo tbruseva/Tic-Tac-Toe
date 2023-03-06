@@ -6,13 +6,13 @@ namespace Tic_Tac_Toe_Web_API
 {
     public interface IGameManager
     {
-        public GameResponseDto CreateGame();
-        public List<GameResponseDto> GetAllGames();
-        public GameResponseDto GetGameById(int id);
-        public GameResponseDto JoinGame(int id, Player player);
-        public GameResponseDto SelectMark(int gameId, int playerId, string mark);
-        public GameResponseDto MakeMove(int gameId, int playerId, int rowPosition, int colPosition);
-        public GameResponseDto RestartGame(int gameId, string username);
+        public AllGamesResponseDto CreateGame();
+        public List<AllGamesResponseDto> GetAllGames();
+        public TicTacToeGameResponseDto GetGameById(int id);
+        public AllGamesResponseDto JoinGame(int id, Player player);
+        public TicTacToeGameResponseDto TicTacToeSelectMark(int gameId, int playerId, string mark);
+        public TicTacToeGameResponseDto TicTacToeMakeMove(int gameId, int playerId, int rowPosition, int colPosition);
+        public TicTacToeGameResponseDto TicTacToeRestartGame(int gameId, string username);
 
     }
 }

@@ -5,9 +5,9 @@ namespace Tic_Tac_Toe_Web_API.Models.Mappers
     public class TicTacToeGameMapper
     {
 
-    public TicTacToeGameMapper(TicTacToeGame game) 
+    public TicTacToeGameResponseDto ConvertToResponseDto(TicTacToeGame game) 
         {
-            Player? playerX = game. Players.ElementAtOrDefault(game.PlayerXIndex) != null ? game.Players[game.PlayerXIndex] : null;
+            Player? playerX = game.Players.ElementAtOrDefault(game.PlayerXIndex) != null ? game.Players[game.PlayerXIndex] : null;
             Player? playerO = game.Players.ElementAtOrDefault(game.PlayerOIndex) != null ? game.Players[game.PlayerOIndex] : null;
             int? currentPlayerId = game.Players.ElementAtOrDefault(game.CurrentPlayerIndex) != null ? game.Players[game.CurrentPlayerIndex].Id : null;
 
@@ -16,6 +16,8 @@ namespace Tic_Tac_Toe_Web_API.Models.Mappers
             responseDto.CurrentPlayerId = currentPlayerId;
             responseDto.PlayerX = playerX;
             responseDto.PlayerO = playerO;
+
+            return responseDto;
         }
     }
 }

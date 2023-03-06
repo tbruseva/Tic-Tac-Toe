@@ -36,22 +36,6 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             }
         }
 
-        [Route("{gameId}")]
-        [HttpGet]
-        public IActionResult GetGameById([FromRoute] int gameId)
-        {
-            try
-            {
-                var game = _gameManager.GetGameById(gameId);
-
-                return StatusCode(200, game);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
         [Route("Player")]
         [HttpPost]
         public IActionResult CreatePlayer([FromHeader] string username)
