@@ -8,6 +8,9 @@ using Tic_Tac_Toe_Web_API.Controllers;
 using Tic_Tac_Toe_Web_API;
 using Tic_Tac_Toe_Web_API.Models;
 using Microsoft.AspNetCore.Mvc;
+using Tic_Tac_Toe_Web_API.Enums;
+using Tic_Tac_Toe_Web_API.Models.Dtos;
+using Tic_Tac_Toe_Web_API.Models.Interfaces;
 
 namespace TicTacToeWebAPI.Tests.ControllersTests
 {
@@ -26,6 +29,47 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             _playerManager = new Mock<IPlayerManager>();
             _controller = new TicTacToeController(_gameManager.Object, _playerManager.Object);
         }
+
+        [Test]
+        public void GetGameById_Should_Return_Game_If_Game_Exists()
+        {
+            //Arrange
+            int gameId = 1;
+            var playerX = new Player { Name = "to" };
+            var playerO = new Player { Name = "no" };
+            var responseDto = new TicTacToeGameResponseDto { GameId = 1, Grid = new Mark[9], PlayerX = playerX, PlayerO = playerO, CurrentPlayerId = 0 };
+
+            _gameManager.Setup(g => g.GetGameById(gameId)).Returns(responseDto);
+
+            //Act
+            var result = _controller.GetGameById(1);
+
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
+
+            var okResult = result as ObjectResult;
+            Assert.That(okResult.Value, Is.EqualTo(responseDto));
+        }
+
+
+        [Test]
+        public void GetGameById_Should_Catch_Exception_If_Game_Doesnot_Exists()
+        {
+            //Arrange
+            int gameId = 1;
+            _gameManager.Setup(g => g.GetGameById(gameId)).Throws<Exception>();
+
+            //Act
+            var result = _controller.GetGameById(1);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
+
+            var okResult = result as ObjectResult;
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+        }
+
 
         //[Test]
         //public void CreateGame_Should_Return_Properly_Created_Game()
@@ -72,5 +116,28 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         //    var okResult = result as ObjectResult;
         //    Assert.AreEqual(okResult.Value, game);
         //}
+
+        [Test]
+        public void SelectMark_Should_Return_Updated_Game_Details()
+        {
+            //Arrage
+            var gameId = 1;
+            var playerId = 1;
+            var mark = "O";
+            var playerX = new Player { Name = "to" };
+            var playerO = new Player { Name = "no" };
+            var responseDto = new TicTacToeGameResponseDto { GameId = 1, Grid = new Mark[9], PlayerX = playerX, PlayerO = playerO, CurrentPlayerId = 0 };
+            _gameManager.Setup(g => g.TicTacToeSelectMark(gameId, 1, "O")).Returns(responseDto);
+
+            //Act
+            var result = _controller.SelectMark(playerId, gameId, mark);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
+
+            var okResult = result as ObjectResult;
+            Assert.That(okResult.Value, Is.EqualTo(responseDto));
+        }
     }
 }

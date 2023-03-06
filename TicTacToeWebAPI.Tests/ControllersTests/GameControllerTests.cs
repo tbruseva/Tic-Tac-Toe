@@ -4,12 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Tic_Tac_Toe_Web_API;
 using Tic_Tac_Toe_Web_API.Controllers;
 using Tic_Tac_Toe_Web_API.Enums;
 using Tic_Tac_Toe_Web_API.Models;
+using Tic_Tac_Toe_Web_API.Models.Dtos;
 using Tic_Tac_Toe_Web_API.Models.Interfaces;
 
 namespace TicTacToeWebAPI.Tests.ControllersTests
@@ -30,100 +32,130 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             _controller = new GameController(_gameManager.Object, _playerManager.Object);
         }
 
-        //[Test]
-        //public void AllGames_Should_Return_List_Of_All_Games_If_Any_Are_Created()
-        //{
-        //    //Arrange
-        //    var games = new List<IGame> { new TicTacToeGame { Id = 1, Name = "Tic-Tac-Toe", GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Grid = new Tic_Tac_Toe_Web_API.Enums.Mark[9], Players = new List<Player>() } };
+        [Test]
+        public void AllGames_Should_Return_List_Of_All_Games_If_Any_Are_Created()
+        {
+            //Arrange
+            var responseDto = new List<AllGamesResponseDto> { new AllGamesResponseDto { GameId = 1, GameName =
+                "Tic-Tac-Toe", GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Players = new List<Player>(), MaxPlayers = 2, MinPlayers = 2}};
 
-        //    _gameManager.Setup(g => g.GetAllGames()).Returns(games.Select(g=>g.ToJson());
+            _gameManager.Setup(g => g.GetAllGames()).Returns(responseDto);
 
-        //    //Act
-        //    var result = _controller.AllGames();
+            //Act
+            var result = _controller.AllGames();
 
-        //    //Assert
-        //    Assert.IsNotNull(result);
-        //    Assert.IsInstanceOf<ObjectResult>(result);
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
 
-        //    var okResult = result as ObjectResult;
-        //    Assert.AreEqual(games, okResult.Value);
-        //}
+            var okResult = result as ObjectResult;
+            Assert.AreEqual(responseDto, okResult.Value);
+        }
 
-        //[Test]
-        //public void AllGames_Should_Return_Empty_List_If_No_Games_Are_Created()
-        //{
-        //    //Arrange
-        //    var games = new List<IGame>();
-        //    _gameManager.Setup(g => g.GetAllGames()).Returns(games);
+        [Test]
+        public void AllGames_Should_Return_Empty_List_If_No_Games_Are_Created()
+        {
+            //Arrange
+            var responseDto = new List<AllGamesResponseDto>();
+            _gameManager.Setup(g => g.GetAllGames()).Returns(responseDto);
 
-        //    //Act
-        //    var result = _controller.AllGames();
+            //Act
+            var result = _controller.AllGames();
 
-        //    //Assert
-        //    Assert.IsNotNull(result);
-        //    Assert.IsInstanceOf<ObjectResult>(result);
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
 
-        //    var okResult = result as ObjectResult;
-        //    Assert.That(okResult.Value, Is.EqualTo(games));
-        //}
+            var okResult = result as ObjectResult;
+            Assert.That(okResult.Value, Is.EqualTo(responseDto));
+        }
 
-        //[Test]
-        //public void GetGameById_Should_Return_Game_If_Game_Exists()
-        //{
-        //    //Arrange
-        //    int gameId = 1;
-        //    var game = new TicTacToeGame { Id = 1, Name = "Tic-Tac-Toe", GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Grid = new Tic_Tac_Toe_Web_API.Enums.Mark[9], Players = new List<Player>() };
+        [Test]
+        public void CreateGame_Should_Return_Created_Game()
+        {
+            //Arrange
+            var responseDto = new AllGamesResponseDto { GameId = 1, GameName =
+                "Tic-Tac-Toe", GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Players = new List<Player>(), MaxPlayers = 2, MinPlayers = 2};
+            _gameManager.Setup(g => g.CreateGame()).Returns(responseDto);
 
-        //    _gameManager.Setup(g => g.GetGameById(gameId)).Returns(game);
+            //Act
+            var result = _controller.CreateGame();
 
-        //    //Act
-        //    var result = _controller.GetGameById(1);
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
 
-        //    Assert.IsNotNull(result);
-        //    Assert.IsInstanceOf<ObjectResult>(result);
+            var okResult = result as ObjectResult;
+            Assert.That(okResult.Value, Is.EqualTo(responseDto));
+        }
 
-        //    var okResult = result as ObjectResult;
-        //    Assert.That(okResult.Value, Is.EqualTo(game));
+            [Test]
+        public void CreatePlayer_Should_Return_Created_Player_Details() 
+        {
+            //Arrange
+            string username = "to";
+            var player = new Player { Name= username };
+            var responseDto = new PlayerResponseDto { Id = player.Id, Name = player.Name };
+            _playerManager.Setup(g => g.CreatePlayer(username)).Returns(responseDto);
 
-        //}
+            // Act
+            var result = _controller.CreatePlayer(username);
 
-        //[Test]
-        //public void GetGameById_Should_Catch_Exception_If_Game_Doesnot_Exists()
-        //{
-        //    //Arrange
-        //    int gameId = 1;
-        //    _gameManager.Setup(g => g.GetGameById(gameId)).Throws<Exception>();
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
 
-        //    //Act
-        //    var result = _controller.GetGameById(1);
+            var okResult = result as ObjectResult;
+            Assert.That(okResult.Value, Is.EqualTo(responseDto));
+        }
 
-        //    Assert.IsNotNull(result);
-        //    Assert.IsInstanceOf<ObjectResult>(result);
+        [Test]
+        public void CreatePlayer_Should_Catch_Exception_If_Player_Exist()
+        {
+            //Arrange
+            string username = "to";
+            _playerManager.Setup(g => g.CreatePlayer(username)).Throws<InvalidOperationException>();
 
-        //    var okResult = result as ObjectResult;
-        //    Assert.IsInstanceOf<BadRequestObjectResult>(result);
-        //}
+            //Act
+            var result = _controller.CreatePlayer(username);
 
-        //[Test]
-        //public void SelectFirstOrSecondPlayer_Should_Return_Updated_Player_Details()
-        //{ 
-        //    //Arrage
-        //    var gameId = 1;
-        //    var username = "to";
-        //    var mark = "O";
-        //    var player = new Player {Name = "to", Mark = Tic_Tac_Toe_Web_API.Enums.Mark.O};
-        //    var game = new TicTacToeGame { Id = 1, Name = "Tic-Tac-Toe", CurrentMark = Tic_Tac_Toe_Web_API.Enums.Mark.X, GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Grid = new Tic_Tac_Toe_Web_API.Enums.Mark[9], Players = new List<Player> { player } };
-        //    _gameManager.Setup(g => g.SelectMark(gameId, username, mark)).Returns(player);
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
 
-        //    //Act
-        //    var result = _controller.SelectMark(username, gameId, mark);
+            var okResult = result as ObjectResult;
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+        }
 
-        //    //Assert
-        //    Assert.IsNotNull(result);
-        //    Assert.IsInstanceOf<ObjectResult>(result);
+        [Test]
+        public void JoinGame_Should_Updated_Game_Details()
+        {
+            //Arrange
+            int gameId = 1;
+            int playerId = 1;
+            Player player = new Player { Name = "to" };
+            var responseDto = new AllGamesResponseDto
+            {
+                GameId = 1,
+                GameName =
+                "Tic-Tac-Toe",
+                GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted,
+                Players = new List<Player>(),
+                MaxPlayers = 2,
+                MinPlayers = 2
+            };
+            _playerManager.Setup(g => g.GetPlayer(playerId)).Returns(player);
+            _gameManager.Setup(g => g.JoinGame(gameId, player)).Returns(responseDto);
 
-        //    var okResult = result as ObjectResult;
-        //    Assert.That(okResult.Value, Is.EqualTo(player));
-        //}
+            //Act
+            var result = _controller.JoinGame(gameId, playerId);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
+
+            var okResult = result as ObjectResult;
+            Assert.That(okResult.Value, Is.EqualTo(responseDto));
+        }
     }
 }

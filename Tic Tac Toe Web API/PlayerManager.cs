@@ -1,10 +1,19 @@
 ﻿using Tic_Tac_Toe_Web_API.Models;
+using Tic_Tac_Toe_Web_API.Models.Dtos;
+using Tic_Tac_Toe_Web_API.Models.Mappers;
 
 namespace Tic_Tac_Toe_Web_API
 {
     public class PlayerManager : IPlayerManager
     {
         private List<Player> players = new List<Player>();
+
+        private PlayerMapper _playerMapper;
+
+        public PlayerManager(PlayerMapper playerMapper)
+        {
+            _playerMapper = playerMapper;
+        }
 
         public Player GetPlayer(string username)
         {
@@ -45,7 +54,7 @@ namespace Tic_Tac_Toe_Web_API
             return false;
         }
 
-        public Player CreatePlayer(string username)
+        public PlayerResponseDto CreatePlayer(string username)
         {
             if (CheckPlayerExist(username))
             {
@@ -53,9 +62,11 @@ namespace Tic_Tac_Toe_Web_API
             }
 
             var player = new Player();
-            player.Name = username;
+            player.Name = username; 
             players.Add(player);
-            return player;
+            var responseDto = _playerMapper.ConvertToResponseDto(player);
+
+            return responseDto;
         }
 
     }

@@ -36,6 +36,22 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             }
         }
 
+        [Route("CreateGame")]
+        [HttpPost]
+        public IActionResult CreateGame()
+        {
+            try
+            {
+                var game = _gameManager.CreateGame();
+
+                return StatusCode(200, game);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [Route("Player")]
         [HttpPost]
         public IActionResult CreatePlayer([FromHeader] string username)
@@ -59,22 +75,6 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             {
                 var player = _playerManager.GetPlayer(playerId);
                 var game = _gameManager.JoinGame(gameId, player);
-
-                return StatusCode(200, game);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [Route("CreateGame")]
-        [HttpPost]
-        public IActionResult CreateGame()
-        {
-            try
-            {
-                var game = _gameManager.CreateGame();
 
                 return StatusCode(200, game);
             }

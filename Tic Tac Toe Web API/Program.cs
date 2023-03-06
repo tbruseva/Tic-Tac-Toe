@@ -28,6 +28,7 @@ namespace Tic_Tac_Toe_Web_API
             builder.Services.AddSingleton<IPlayerManager, PlayerManager>();
             builder.Services.AddScoped<AllGamesMapper>();
             builder.Services.AddScoped<TicTacToeGameMapper>();
+            builder.Services.AddScoped<PlayerMapper>();
 
             var app = builder.Build();
 
