@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Tic_Tac_Toe_Web_API.Enums;
 using Tic_Tac_Toe_Web_API.Models.Dtos;
 using Tic_Tac_Toe_Web_API.Models.Interfaces;
+using NUnit.Framework.Internal;
 
 namespace TicTacToeWebAPI.Tests.ControllersTests
 {
@@ -44,6 +45,7 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             //Act
             var result = _controller.GetGameById(1);
 
+            //Assert
             Assert.IsNotNull(result);
             Assert.IsInstanceOf<ObjectResult>(result);
 
@@ -53,7 +55,7 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
 
 
         [Test]
-        public void GetGameById_Should_Catch_Exception_If_Game_Doesnot_Exists()
+        public void GetGameById_Should_Catch_Exception_If_GameManager_Throws_Exception()
         {
             //Arrange
             int gameId = 1;
@@ -70,55 +72,39 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             Assert.IsInstanceOf<BadRequestObjectResult>(result);
         }
 
+        [Test]
+        public void MakeMove_Should_Return_ResponseDto()
+        {
+            int playerId = 1;
+            int gameId = 1;
+            int rowPosition = 0;
+            int colPosition = 0;
+            var playerX = new Player { Name = "to" };
+            var playerO = new Player { Name = "no" };
+            var responseDto = new TicTacToeGameResponseDto { GameId = 1, Grid = new Mark[9], PlayerX = playerX, PlayerO = playerO, CurrentPlayerId = 0 };
 
-        //[Test]
-        //public void CreateGame_Should_Return_Properly_Created_Game()
-        //{
-        //    //Arrange
-        //    var game = new TicTacToeGame { Id = 1, Name = "Tic-Tac-Toe", CurrentMark = Tic_Tac_Toe_Web_API.Enums.Mark.X, GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Grid = new Tic_Tac_Toe_Web_API.Enums.Mark[9], Players = new List<Player>() };
+            _gameManager.Setup(g => g.TicTacToeMakeMove(playerId, gameId, rowPosition, colPosition)).Returns(responseDto);
 
-        //    _gameManager.Setup(g => g.CreateGame()).Returns(game);
+            //Act
+            var result = _controller.MakeMove(playerId, gameId, rowPosition, colPosition);
 
-        //    //Act
-        //    var result = _controller.CreateGame();
-        //    var okResult = result as ObjectResult;
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
 
-        //    //Assert
-        //    Assert.IsNotNull(result);
-        //    Assert.IsInstanceOf<ObjectResult>(result);
-
-        //    Assert.AreEqual(okResult.Value, game);
-        //}
-
-        //[Test]
-        //public void JoinGame_Should_Add_Player_To_Existing_Game()
-        //{
-        //    //Arrange
-        //    var gameId = 1;
-        //    var mark = "O";
-        //    var username = "to";
-        //    var player = new Player { Name = "to", Mark = Tic_Tac_Toe_Web_API.Enums.Mark.O};
-        //    var game = new TicTacToeGame { Id = 1, Name = "Tic-Tac-Toe", CurrentMark = Tic_Tac_Toe_Web_API.Enums.Mark.X, GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Grid = new Tic_Tac_Toe_Web_API.Enums.Mark[9], Players = new List<Player>{player}};
-
-        //    _playerManager.Setup(p=>p.CreatePlayer(username)).Returns(player);
-        //    _gameManager.Setup(g => g.CreateGame()).Returns(game);
-        //    _gameManager.Setup(g => g.JoinGame(gameId, player, mark)).Returns(game);
-
-
-        //    //Act
-        //    var createdGame = _controller.CreateGame();
-        //    var result = _controller.JoinGame(gameId, username, mark);
-
-        //    //Assert
-        //    Assert.IsNotNull(result);
-        //    Assert.IsInstanceOf<ObjectResult>(result);
-
-        //    var okResult = result as ObjectResult;
-        //    Assert.AreEqual(okResult.Value, game);
-        //}
+            var okResult = result as ObjectResult;
+            Assert.That(okResult.Value, Is.EqualTo(responseDto));
+        }
 
         [Test]
-        public void SelectMark_Should_Return_Updated_Game_Details()
+        public void MakeMove_Should_Catch_Exception_If_GameManager_Throws_Exception()
+        {
+            
+        }
+        
+
+        [Test]
+        public void TicTacToeSelectMark_Should_Return_Updated_Game_Details()
         {
             //Arrage
             var gameId = 1;

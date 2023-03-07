@@ -40,8 +40,8 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = _gameManager.TicTacToeMakeMove(gameId, playerId, rowPosition, colPosition);
-                return StatusCode(200, game);
+                var gameResponseDto = _gameManager.TicTacToeMakeMove(gameId, playerId, rowPosition, colPosition);
+                return StatusCode(200, gameResponseDto);
             }
             catch (Exception ex)
             {

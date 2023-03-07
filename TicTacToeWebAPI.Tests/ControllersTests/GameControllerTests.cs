@@ -157,5 +157,48 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             var okResult = result as ObjectResult;
             Assert.That(okResult.Value, Is.EqualTo(responseDto));
         }
+
+        [Test]
+        public void JoinGame_Should_Catch_Exception_When_PlayerManager_Throws_Exception()
+        {
+            //Arrange
+            int gameId = 1;
+            int playerId = 3;
+            Player player = new Player { Name = "to" };
+            
+            _playerManager.Setup(g => g.GetPlayer(playerId)).Throws<Exception>();
+
+            //Act
+            var result = _controller.JoinGame(gameId, playerId);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
+            
+            var okResult = result as ObjectResult;
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+        }
+
+        [Test]
+        public void JoinGame_Should_Catch_Exception_When_GameManager_Throws_Exception()
+        {
+            //Arrange
+            int gameId = 1;
+            int playerId = 3;
+            Player player = new Player { Name = "bo" };
+
+            _playerManager.Setup(g => g.GetPlayer(playerId)).Returns(player);
+            _gameManager.Setup(g=>g.JoinGame(gameId, player)).Throws<Exception>();
+
+            //Act
+            var result = _controller.JoinGame(gameId, playerId);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
+
+            var okResult = result as ObjectResult;
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+        }
     }
 }
