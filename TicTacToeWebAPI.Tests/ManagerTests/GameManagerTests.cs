@@ -2,13 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Tic_Tac_Toe_Web_API;
 using Tic_Tac_Toe_Web_API.Enums;
 using Tic_Tac_Toe_Web_API.Models;
+using Tic_Tac_Toe_Web_API.Models.Dtos;
 using Tic_Tac_Toe_Web_API.Models.Interfaces;
+using Tic_Tac_Toe_Web_API.Models.Mappers;
 
 namespace TicTacToeWebAPI.Tests.ManagerTests
 {
@@ -16,17 +19,70 @@ namespace TicTacToeWebAPI.Tests.ManagerTests
     public class GameManagerTests
     {
         private IGameManager _gameManager;
-        //List<IGame> _allGames = new List<IGame>();
+        private AllGamesMapper _gameMapper;
+        List<IGame> _allGames = new List<IGame>();
 
         [SetUp]
         public void Setup()
         {
             _gameManager = new GameManager();
+            _gameMapper = new AllGamesMapper();
         }
+
+        [Test]
+        public void GetAllGames_Should_Return_List_Of_All_Games()
+        {
+            IGame game = new TicTacToeGame();
+            var listOfGames = GetListOfAllGames(_gameManager);
+
+            var responseDto = listOfGames.Select(g => _gameMapper.ConvertToResponseDto(g));
+
+            //Act
+            var result = _gameManager.GetAllGames();
+
+            //Assert
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(responseDto));
+        }
+
+        [Test]
+        public void GetGameById_Should_Return_TicTacToeGameResponseDto()
+        {
+            //Arrange
+            var game = _gameManager.CreateGame();
+
+            //Act
+            var result = _gameManager.GetGameById(1);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.That(result.GameId, Is.EqualTo(game.GameId));
+        }
+
         [Test]
         public void GetGameByid_Should_Throw_Exception_If_Game_Not_Found()
         {
-            Assert.That(() => _gameManager.GetGameById(1), Throws.TypeOf<Exception>());
+            Assert.That(() => _gameManager.GetGameById(1), Throws.TypeOf<Exception>()
+                .With
+                .Property("Message")
+                .EqualTo("Game doesn't exist!"));
+        }
+
+        [Test]
+        public void CreateGame_Should_Return_Created_Game()
+        {
+            
+        }
+
+        [Test]
+        public void JoinGame_Should_Add_Player_In_Existing_Game()
+        {
+            var game = new TicTacToeGame();
+            var player = new Player();
+
+           var result = _gameManager.JoinGame(game.Id, player);
+
+            Assert.That(result.Players[0].Id, Is.EqualTo(player.Id));
         }
 
         //[Test]
@@ -38,7 +94,7 @@ namespace TicTacToeWebAPI.Tests.ManagerTests
         //    Player player3 = new Player();
         //    var game = new TicTacToeGame { Id = 1, Name = "Tic-Tac-Toe", CurrentMark = Tic_Tac_Toe_Web_API.Enums.Mark.X, GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Grid = new Tic_Tac_Toe_Web_API.Enums.Mark[9], Players = new List<Player> { player1, player2 } };
 
-           
+
         //    //Act & Assert
         //    Assert.That(()=> _gameManager.AddPlayer(game, player3), Throws.TypeOf<Exception>());
         //}
@@ -102,5 +158,12 @@ namespace TicTacToeWebAPI.Tests.ManagerTests
 
         //    Assert.That(()=>_gameManager.RestartGame(gameId, username),Throws.TypeOf<UnauthorizedAccessException>());
         //}
+
+        private List<IGame> GetListOfAllGames(IGameManager gameManager)
+        {
+            var field = typeof(GameManager).GetField("_allGames", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            return (List<IGame>)field.GetValue(gameManager);
+        }
     }
 }

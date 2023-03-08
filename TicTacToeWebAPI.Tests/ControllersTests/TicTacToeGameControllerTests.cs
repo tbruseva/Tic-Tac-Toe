@@ -99,12 +99,26 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         [Test]
         public void MakeMove_Should_Catch_Exception_If_GameManager_Throws_Exception()
         {
-            
+            int playerId = 1;
+            int gameId = 1;
+            int rowPosition = 0;
+            int colPosition = 0;
+            _gameManager.Setup(g => g.TicTacToeMakeMove(playerId, gameId, rowPosition, colPosition)).Throws<UnauthorizedAccessException>();
+
+            //Act
+            var result = _controller.MakeMove(playerId, gameId, rowPosition, colPosition);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
+
+            var okResult = result as ObjectResult;
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
         }
         
 
         [Test]
-        public void TicTacToeSelectMark_Should_Return_Updated_Game_Details()
+        public void TicTacToeSelectMark_Should_Return_ResponseDto()
         {
             //Arrage
             var gameId = 1;
@@ -113,7 +127,7 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             var playerX = new Player { Name = "to" };
             var playerO = new Player { Name = "no" };
             var responseDto = new TicTacToeGameResponseDto { GameId = 1, Grid = new Mark[9], PlayerX = playerX, PlayerO = playerO, CurrentPlayerId = 0 };
-            _gameManager.Setup(g => g.TicTacToeSelectMark(gameId, 1, "O")).Returns(responseDto);
+            _gameManager.Setup(g => g.TicTacToeSelectMark(gameId, playerId, mark)).Returns(responseDto);
 
             //Act
             var result = _controller.SelectMark(playerId, gameId, mark);
@@ -124,6 +138,68 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
 
             var okResult = result as ObjectResult;
             Assert.That(okResult.Value, Is.EqualTo(responseDto));
+        }
+
+        [Test]
+        public void TicTacToeSelectMark_Should_Catch_Unauthorized_Exception_If_GameManager_Throws_Exception()
+        {
+            //Arrange
+            var gameId = 1;
+            var playerId = 1;
+            var mark = "O";
+            _gameManager.Setup(g => g.TicTacToeSelectMark(gameId, playerId, mark)).Throws<UnauthorizedAccessException>();
+
+            //Act
+            var result = _controller.SelectMark(playerId, gameId, mark);
+
+            //Assert
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
+
+            var okResult = result as ObjectResult;
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+        }
+
+        [Test]
+        public void RestartGame_Should_Return_ResponseDto_If_Game_Is_Successfuly_Restarted()
+        {
+            var gameId = 1;
+            int playerId = 1;
+            var playerX = new Player { Name = "to" };
+            var playerO = new Player { Name = "no" };
+            var responseDto = new TicTacToeGameResponseDto { GameId = 1, Grid = new Mark[9], PlayerX = playerX, PlayerO = playerO, CurrentPlayerId = 0 };
+
+            _gameManager.Setup(g => g.TicTacToeRestartGame(gameId, playerId)).Returns(responseDto);
+
+            //Act
+            var result = _controller.RestartGame(gameId, playerId);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
+
+            var okResult = result as ObjectResult;
+            Assert.That(okResult.Value, Is.EqualTo(responseDto));
+        }
+
+        [Test]
+        public void RestartGame_Should_Catch_Exceptio_If_Game_Not_Restarted()
+        {
+            var gameId = 1;
+            int playerId = 1;
+
+            _gameManager.Setup(g => g.TicTacToeRestartGame(gameId, playerId)).Throws<UnauthorizedAccessException>();
+
+            //Act
+            var result = _controller.RestartGame(gameId, playerId);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
+
+            var okResult = result as ObjectResult;
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
         }
     }
 }

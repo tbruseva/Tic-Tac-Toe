@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System;
 using Tic_Tac_Toe_Web_API.Models.Interfaces;
 
 namespace Tic_Tac_Toe_Web_API.Controllers
@@ -67,17 +68,16 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         [Route("RestartGame/{gameId}")]
         [HttpPost]
-        public IActionResult RestartGame([FromRoute] int gameId, [FromHeader] string username)
+        public IActionResult RestartGame([FromRoute] int gameId, [FromHeader] int playerId)
         {
             try
             {
-                var game = _gameManager.TicTacToeRestartGame(gameId, username);
+                var game = _gameManager.TicTacToeRestartGame(gameId, playerId);
                 return StatusCode(200, game);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                return BadRequest(ex.Message);
             }
         }
     }

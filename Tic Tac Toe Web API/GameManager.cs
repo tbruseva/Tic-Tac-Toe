@@ -27,11 +27,12 @@ namespace Tic_Tac_Toe_Web_API
         public TicTacToeGameResponseDto GetGameById(int id)
         {
             var game = _allGames.Where(g => g.Id == id).Select(g => g as TicTacToeGame).FirstOrDefault();
-            var responseDto =_TicTacToeMapper.ConvertToResponseDto(game);
             if (game == null)
             {
                 throw new Exception("Game doesn't exist!");
             }
+            var responseDto = _TicTacToeMapper.ConvertToResponseDto(game);
+
             return responseDto;
         }
 
@@ -68,12 +69,12 @@ namespace Tic_Tac_Toe_Web_API
             return gameResponseDto;
         }
 
-        public TicTacToeGameResponseDto TicTacToeRestartGame(int gameId, string username)
+        public TicTacToeGameResponseDto TicTacToeRestartGame(int gameId, int playerId)
         {
             var game = GetGame(gameId) as TicTacToeGame;
             foreach (var player in game.Players)
             {
-                if (player.Name == username)
+                if (player.Id == playerId)
                 {
                     game.RestartGame();
                 }
@@ -97,6 +98,7 @@ namespace Tic_Tac_Toe_Web_API
 
             return gameResponseDto;
         }
+
 
     #region Private methods
     private IGame GetGame(int id)
