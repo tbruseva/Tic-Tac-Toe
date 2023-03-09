@@ -77,6 +77,7 @@ namespace Tic_Tac_Toe_Web_API
                 if (player.Id == playerId)
                 {
                     game.RestartGame();
+                    break;
                 }
                 else
                 {

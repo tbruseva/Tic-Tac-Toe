@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoFixture;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,8 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         private Mock<IGameManager> _gameManager;
         private Mock<IPlayerManager> _playerManager;
 
+        private static readonly Fixture _fixture = new Fixture ();
+
         [SetUp]
         public void Setup()
         {
@@ -36,8 +39,7 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         public void AllGames_Should_Return_List_Of_All_Games_If_Any_Are_Created()
         {
             //Arrange
-            var responseDto = new List<AllGamesResponseDto> { new AllGamesResponseDto { GameId = 1, GameName =
-                "Tic-Tac-Toe", GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Players = new List<Player>(), MaxPlayers = 2, MinPlayers = 2}};
+            var responseDto = _fixture.CreateMany<AllGamesResponseDto>(3).ToList();
 
             _gameManager.Setup(g => g.GetAllGames()).Returns(responseDto);
 
@@ -53,7 +55,7 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         }
 
         [Test]
-        public void AllGames_Should_Return_Empty_List_If_No_Games_Are_Created()
+        public void AllGames_Should_Returns_Response_Dto()
         {
             //Arrange
             var responseDto = new List<AllGamesResponseDto>();
@@ -74,8 +76,7 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         public void CreateGame_Should_Return_Created_Game()
         {
             //Arrange
-            var responseDto = new AllGamesResponseDto { GameId = 1, GameName =
-                "Tic-Tac-Toe", GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Players = new List<Player>(), MaxPlayers = 2, MinPlayers = 2};
+            var responseDto = _fixture.Create<AllGamesResponseDto>();
             _gameManager.Setup(g => g.CreateGame()).Returns(responseDto);
 
             //Act
@@ -110,7 +111,7 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         }
 
         [Test]
-        public void CreatePlayer_Should_Catch_Exception_If_Player_Exist()
+        public void CreatePlayer_Should_Catch_Exception_If_PlayerManager_Throws_Exception()
         {
             //Arrange
             string username = "to";
@@ -128,27 +129,16 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         }
 
         [Test]
-        public void JoinGame_Should_Updated_Game_Details()
+        public void JoinGame_Should_Return_ResponseDto()
         {
             //Arrange
-            int gameId = 1;
-            int playerId = 1;
-            Player player = new Player { Name = "to" };
-            var responseDto = new AllGamesResponseDto
-            {
-                GameId = 1,
-                GameName =
-                "Tic-Tac-Toe",
-                GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted,
-                Players = new List<Player>(),
-                MaxPlayers = 2,
-                MinPlayers = 2
-            };
-            _playerManager.Setup(g => g.GetPlayer(playerId)).Returns(player);
-            _gameManager.Setup(g => g.JoinGame(gameId, player)).Returns(responseDto);
+            Player player = _fixture.Create<Player>();
+            var responseDto = _fixture.Create<AllGamesResponseDto>();
+            _playerManager.Setup(g => g.GetPlayer(player.Id)).Returns(player);
+            _gameManager.Setup(g => g.JoinGame(responseDto.GameId, player)).Returns(responseDto);
 
             //Act
-            var result = _controller.JoinGame(gameId, playerId);
+            var result = _controller.JoinGame(responseDto.GameId, player.Id);
 
             //Assert
             Assert.IsNotNull(result);
@@ -164,7 +154,6 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             //Arrange
             int gameId = 1;
             int playerId = 3;
-            Player player = new Player { Name = "to" };
             
             _playerManager.Setup(g => g.GetPlayer(playerId)).Throws<Exception>();
 
@@ -184,14 +173,13 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         {
             //Arrange
             int gameId = 1;
-            int playerId = 3;
-            Player player = new Player { Name = "bo" };
+            Player player = _fixture.Create<Player>();
 
-            _playerManager.Setup(g => g.GetPlayer(playerId)).Returns(player);
+            _playerManager.Setup(g => g.GetPlayer(player.Id)).Returns(player);
             _gameManager.Setup(g=>g.JoinGame(gameId, player)).Throws<Exception>();
 
             //Act
-            var result = _controller.JoinGame(gameId, playerId);
+            var result = _controller.JoinGame(gameId, player.Id);
 
             //Assert
             Assert.IsNotNull(result);

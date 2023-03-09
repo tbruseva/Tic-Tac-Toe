@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using AutoFixture;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,8 @@ namespace TicTacToeWebAPI.Tests.ManagerTests
         private IGameManager _gameManager;
         private AllGamesMapper _gameMapper;
         List<IGame> _allGames = new List<IGame>();
+
+        private static readonly Fixture _fixture = new Fixture();
 
         [SetUp]
         public void Setup()
@@ -46,7 +49,7 @@ namespace TicTacToeWebAPI.Tests.ManagerTests
         }
 
         [Test]
-        public void GetGameById_Should_Return_TicTacToeGameResponseDto()
+        public void GetGameById_Should_Return_Game_If_Game_Exist()
         {
             //Arrange
             var game = _gameManager.CreateGame();
@@ -77,76 +80,125 @@ namespace TicTacToeWebAPI.Tests.ManagerTests
         [Test]
         public void JoinGame_Should_Add_Player_In_Existing_Game()
         {
-            var game = new TicTacToeGame();
-            var player = new Player();
+            var game = _gameManager.CreateGame();
+            var player = _fixture.Create<Player>();
 
-           var result = _gameManager.JoinGame(game.Id, player);
+           var result = _gameManager.JoinGame(game.GameId, player);
 
             Assert.That(result.Players[0].Id, Is.EqualTo(player.Id));
+            Assert.That(result.Players.Count, Is.EqualTo(1));
         }
 
-        //[Test]
-        //public void AddPlayer_Should_Throw_Exception_If_Game_Max_Players_Reached()
-        //{
-        //    //Arrange
-        //    Player player1 = new Player();
-        //    Player player2 = new Player();
-        //    Player player3 = new Player();
-        //    var game = new TicTacToeGame { Id = 1, Name = "Tic-Tac-Toe", CurrentMark = Tic_Tac_Toe_Web_API.Enums.Mark.X, GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Grid = new Tic_Tac_Toe_Web_API.Enums.Mark[9], Players = new List<Player> { player1, player2 } };
+        [Test]
+        public void JoinGame_Should_Add_Second_Player_In_Existing_Game()
+        {
+            var game = _gameManager.CreateGame();
+            var player1 = _fixture.Create<Player>();
+            var player2 = _fixture.Create<Player>();
+            _gameManager.JoinGame(game.GameId, player1);
 
+            var result = _gameManager.JoinGame(game.GameId, player2);
 
-        //    //Act & Assert
-        //    Assert.That(()=> _gameManager.AddPlayer(game, player3), Throws.TypeOf<Exception>());
-        //}
+            Assert.That(result.Players[1].Id, Is.EqualTo(player2.Id));
+            Assert.That(result.Players.Count, Is.EqualTo(2));
+        }
 
-        //[Test]
-        //public void SelectMark_Should_Throw_Exception_If_Player_Doesnt_Exist_In_Game_List_Of_Players()
-        //{
-        //    var player1 = new Player { Name = "to" };
-        //    var player2 = new Player { Name = "no" };
-        //    string username = "po";
-        //    string mark = "O";
-        //    int gameId = 1;
-        //    //var game1 = new TicTacToeGame { Id = 1, Name = "Tic-Tac-Toe", CurrentMark = Tic_Tac_Toe_Web_API.Enums.Mark.X, GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Grid = new Tic_Tac_Toe_Web_API.Enums.Mark[9], Players = new List<Player> { player1, player2 } };
+        [Test]
+        public void JoinGame_Should_Throw_Exception_If_Max_Players_Reached()
+        {
+            var game = _gameManager.CreateGame();
+            var player1 = _fixture.Create<Player>();
+            var player2 = _fixture.Create<Player>();
+            var player3 = _fixture.Create<Player>();
+            _gameManager.JoinGame(game.GameId, player1);
+            _gameManager.JoinGame(game.GameId, player2);
 
+            Assert.That(() => _gameManager.JoinGame(game.GameId, player3), Throws.TypeOf<Exception>()
+                .With
+                .Property("Message")
+                .EqualTo("Game is already started! You can not join this game!"));
+        }
 
-        //    var game = _gameManager.CreateGame();
-        //    game.Players.Add(player1);
-        //    game.Players.Add(player2);
+        [Test]
+        public void TicTacToeSelectMark_Should_Update_First_Player_Mark()
+        {
+            var player1 = new Player { Name = "to" };
+            //var player2 = new Player { Name = "no" };
+            var player2 = new Player { Name = "po" };
+            string newMark = "O";
+            var game = _gameManager.CreateGame();
+            game.Players.Add(player1);
+            game.Players.Add(player2);
+            game.GameStatus = GameStatus.WaitingForOpponent;
 
+            var updatedGame = _gameManager.TicTacToeSelectMark(game.GameId, game.Players[0].Id, newMark);
 
-        //    Assert.That(() => _gameManager.SelectMark(gameId, username, mark), Throws.TypeOf<UnauthorizedAccessException>());
-        //}
+            Assert.That(updatedGame, Is.Not.Null);
+            Assert.That(updatedGame.PlayerX, Is.EqualTo(player2));
 
-        //[Test]
-        //public void SelectMark_Should_Throw_Exception_If_Mark_Is_Not_Correct_Symbol()
-        //{
-        //    var player1 = new Player { Name = "to" };
-        //    string username = "to";
-        //    string mark = "P";
-        //    //var game = new TicTacToeGame { Id = 1, Name = "Tic-Tac-Toe", CurrentMark = Tic_Tac_Toe_Web_API.Enums.Mark.X, GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Grid = new Tic_Tac_Toe_Web_API.Enums.Mark[9], Players = new List<Player> { player1} };
+        }
 
-        //    var game = _gameManager.CreateGame();
-        //    game.Players.Add(player1);
+        [Test]
+        public void TicTacToeSelectMark_Should_Throw_Exception_If_Player_Doesnt_Exist_In_Game_List_Of_Players()
+        {
+            var player1 = _fixture.Build<Player>().With(p=>p.Name, "to").Create();
+            var player2 = _fixture.Build<Player>().With(p=>p.Name, "no").Create();
+            int player3Id = 3;
+            string mark = "O";
 
-        //    var allGames = _gameManager.GetAllGames();
+            var game = _gameManager.CreateGame();
+            game.Players.Add(player1);
+            game.Players.Add(player2);
 
+            Assert.That(() => _gameManager.TicTacToeSelectMark(game.GameId, player3Id, mark), Throws.TypeOf<UnauthorizedAccessException>());
+        }
 
-        //    Assert.That(() => _gameManager.SelectMark(1, username, mark), Throws.TypeOf<InvalidDataException>());
-        //}
+        [Test]
+        public void TicTacToeSelectMark_Should_Throw_Exception_If_Mark_Is_Not_Correct_Symbol()
+        {
+            var player = _fixture.Build<Player>().With(p => p.Name, "to").Create();
+            string mark = "P";
 
-        //[Test]
-        //public void SelectMark_Should_Throw_Exception_If_Second_Player_Tries_To_Select_Mark()
-        //{
-        //    var player1 = new Player { Name = "to" };
-        //    var player2 = new Player { Name = "no" };
-        //    string username = "no";
-        //    string mark = "O";
-        //    var game = new TicTacToeGame { Id = 1, Name = "Tic-Tac-Toe", CurrentPlayerId = Tic_Tac_Toe_Web_API.Enums.Mark.X, GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Grid = new Tic_Tac_Toe_Web_API.Enums.Mark[9], Players = new List<Player> { player1, player2 } };
+            var game = _gameManager.CreateGame();
+            game.Players.Add(player);
 
-        //    Assert.That(() => _gameManager.SelectMark(1, username, mark), Throws.TypeOf<Exception>());
-        //}
+            Assert.That(() => _gameManager.TicTacToeSelectMark(game.GameId, player.Id, mark), Throws.TypeOf<InvalidDataException>()
+                .With
+                .Property("Message")
+                .EqualTo("Entered symbol is not valid! Please select X or O !"));
+        }
 
+        [Test]
+        public void TicTacToeSelectMark_Should_Throw_Exception_If_Second_Player_Tries_To_Select_Mark()
+        {
+            var player1 = _fixture.Build<Player>().With(p => p.Name, "to").Create();
+            var player2 = _fixture.Build<Player>().With(p => p.Name, "no").Create();
+            string mark = "O";
+
+            var game = _gameManager.CreateGame();
+            game.Players.Add(player1);
+            game.Players.Add(player2);
+
+            Assert.That(() => _gameManager.TicTacToeSelectMark(game.GameId, player2.Id, mark), Throws.TypeOf<UnauthorizedAccessException>()
+                .With
+                .Property("Message")
+                .EqualTo("Only first player entered the game can select a mark!"));
+        }
+
+        [Test]
+        public void TicTacToeRestartGame_Should_Restart_Game_If_First_Player_Restart_The_Game()
+        {
+            var player1 = _fixture.Build<Player>().With(p => p.Name, "to").Create();
+            var player2 = _fixture.Build<Player>().With(p => p.Name, "no").Create();
+            //Doesnt work
+            //var game = _fixture.Build<TicTacToeGame>().With(g => g.Players[0], player1).With(g => g.Players[1], player2).Create();
+            var game = _gameManager.CreateGame();
+            game.Players.Add(player1);
+            game.Players.Add(player2);
+                        var restartedGame = _gameManager.TicTacToeRestartGame(game.GameId, player1.Id);
+
+            Assert.That(restartedGame.Grid, Is.Not.Unique);
+        }
         //[Test]
         //public void RestartGame_Should_Throw_Exception_If_Unauthorized_Player_Tries_To_Restart()
         //{

@@ -12,6 +12,7 @@ using Tic_Tac_Toe_Web_API.Enums;
 using Tic_Tac_Toe_Web_API.Models.Dtos;
 using Tic_Tac_Toe_Web_API.Models.Interfaces;
 using NUnit.Framework.Internal;
+using AutoFixture;
 
 namespace TicTacToeWebAPI.Tests.ControllersTests
 {
@@ -21,6 +22,9 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         private TicTacToeController _controller;
         private Mock<IGameManager> _gameManager;
         private Mock<IPlayerManager> _playerManager;
+
+        private static readonly Fixture _fixture = new Fixture();
+
 
         [SetUp]
         public void Setup()
@@ -35,15 +39,14 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         public void GetGameById_Should_Return_Game_If_Game_Exists()
         {
             //Arrange
-            int gameId = 1;
             var playerX = new Player { Name = "to" };
             var playerO = new Player { Name = "no" };
-            var responseDto = new TicTacToeGameResponseDto { GameId = 1, Grid = new Mark[9], PlayerX = playerX, PlayerO = playerO, CurrentPlayerId = 0 };
+            var responseDto = _fixture.Build<TicTacToeGameResponseDto>().With(r => r.PlayerX, playerX).With(r => r.PlayerO, playerO).Create();
 
-            _gameManager.Setup(g => g.GetGameById(gameId)).Returns(responseDto);
+            _gameManager.Setup(g => g.GetGameById(responseDto.GameId)).Returns(responseDto);
 
             //Act
-            var result = _controller.GetGameById(1);
+            var result = _controller.GetGameById(responseDto.GameId);
 
             //Assert
             Assert.IsNotNull(result);
@@ -81,8 +84,8 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             int colPosition = 0;
             var playerX = new Player { Name = "to" };
             var playerO = new Player { Name = "no" };
-            var responseDto = new TicTacToeGameResponseDto { GameId = 1, Grid = new Mark[9], PlayerX = playerX, PlayerO = playerO, CurrentPlayerId = 0 };
-
+            var responseDto = _fixture.Build<TicTacToeGameResponseDto>().With(r=> r.PlayerX, playerX).With(r=>r.PlayerO, playerO).Create();
+            
             _gameManager.Setup(g => g.TicTacToeMakeMove(playerId, gameId, rowPosition, colPosition)).Returns(responseDto);
 
             //Act
@@ -126,7 +129,8 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             var mark = "O";
             var playerX = new Player { Name = "to" };
             var playerO = new Player { Name = "no" };
-            var responseDto = new TicTacToeGameResponseDto { GameId = 1, Grid = new Mark[9], PlayerX = playerX, PlayerO = playerO, CurrentPlayerId = 0 };
+            var responseDto = _fixture.Build<TicTacToeGameResponseDto>().With(r=> r.PlayerX, playerX).With(r=>r.PlayerO, playerO).Create();
+
             _gameManager.Setup(g => g.TicTacToeSelectMark(gameId, playerId, mark)).Returns(responseDto);
 
             //Act
@@ -168,7 +172,8 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             int playerId = 1;
             var playerX = new Player { Name = "to" };
             var playerO = new Player { Name = "no" };
-            var responseDto = new TicTacToeGameResponseDto { GameId = 1, Grid = new Mark[9], PlayerX = playerX, PlayerO = playerO, CurrentPlayerId = 0 };
+            var responseDto = _fixture.Build<TicTacToeGameResponseDto>().With(r => r.PlayerX, playerX).With(r => r.PlayerO, playerO).Create();
+
 
             _gameManager.Setup(g => g.TicTacToeRestartGame(gameId, playerId)).Returns(responseDto);
 
@@ -184,7 +189,7 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         }
 
         [Test]
-        public void RestartGame_Should_Catch_Exceptio_If_Game_Not_Restarted()
+        public void RestartGame_Should_Catch_Exception_If_GameManager_Throws_Exception()
         {
             var gameId = 1;
             int playerId = 1;
