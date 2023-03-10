@@ -116,7 +116,9 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             Assert.IsInstanceOf<ObjectResult>(result);
 
             var okResult = result as ObjectResult;
+            bool isEqual = responseDto == okResult.Value;
             Assert.That(okResult.Value, Is.EqualTo(responseDto));
+            //Assert.That(IsByValue.ReferenceEquals(okResult, responseDto));
         }
 
         [Test]
