@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Tic_Tac_Toe_Web_API.Enums;
 using Tic_Tac_Toe_Web_API.Managers.Interfaces;
 using Tic_Tac_Toe_Web_API.Models;
+using Tic_Tac_Toe_Web_API.Models.Dtos;
 using Tic_Tac_Toe_Web_API.Models.Interfaces;
 using Tic_Tac_Toe_Web_API.Models.Mappers;
 
@@ -28,11 +29,11 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         [Route("allGames")]
         [HttpGet]
-        public IActionResult AllGames()
+        public async Task<IActionResult> AllGames()
         {
             try
             {
-                var responseDto = _gameManager.GetAllGames().Select(g => _allGamesMapper.ConvertToResponseDto(g));
+                AllGamesResponseDto responseDto =  _gameManager.GetAllGamesAsync().Select(g => _allGamesMapper.ConvertToResponseDto(g));
 
                 return StatusCode(200, responseDto);
             }
@@ -44,11 +45,11 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         [Route("CreateGame")]
         [HttpPost]
-        public IActionResult CreateGame()
+        public async Task<IActionResult> CreateGame()
         {
             try
             {
-                var game = _gameManager.CreateGame();
+                var game = await _gameManager.CreateGameAsync();
                 var responseDto = _allGamesMapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, responseDto);
@@ -61,11 +62,11 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         [Route("Player")]
         [HttpPost]
-        public IActionResult CreatePlayer([FromHeader] string username)
+        public async Task<IActionResult> CreatePlayer([FromHeader] string username)
         {
             try
             {
-                var player = _playerManager.CreatePlayer(username);
+                var player = await _playerManager.CreatePlayerAsync(username);
                 var responseDto = _playerMapper.ConvertToResponseDto(player);
 
                 return StatusCode(200, responseDto);
@@ -78,12 +79,12 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         [Route("JoinGame/{gameId}")]
         [HttpPost]
-        public IActionResult JoinGame([FromRoute] int gameId, [FromHeader] int playerId)
+        public async Task <IActionResult> JoinGame([FromRoute] int gameId, [FromHeader] int playerId)
         {
             try
             {
-                var player = _playerManager.GetPlayer(playerId);
-                var game = _gameManager.JoinGame(gameId, player);
+                var player = await _playerManager.GetPlayerAsync(playerId);
+                var game = await _gameManager.JoinGameAsync(gameId, player);
                 var responseDto = _allGamesMapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, responseDto);

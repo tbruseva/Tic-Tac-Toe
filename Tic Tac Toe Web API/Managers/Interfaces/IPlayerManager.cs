@@ -5,9 +5,9 @@ namespace Tic_Tac_Toe_Web_API.Managers.Interfaces
 {
     public interface IPlayerManager
     {
-        public Player GetPlayer(string username);
-        public Player GetPlayer(int username);
-        public bool CheckPlayerExist(string username);
-        public Player CreatePlayer(string username);
+        public Task<Player> GetPlayerAsync(string username);
+        public Task<Player> GetPlayerAsync(int username);
+        public Task<bool> CheckPlayerExistAsync(string username);
+        public Task<Player> CreatePlayerAsync(string username);
     }
 }

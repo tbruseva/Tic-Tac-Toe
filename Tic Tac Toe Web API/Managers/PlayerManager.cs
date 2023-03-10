@@ -14,7 +14,7 @@ namespace Tic_Tac_Toe_Web_API.Managers
 
         }
 
-        public Player GetPlayer(string username)
+        public async Task<Player> GetPlayerAsync(string username)
         {
             foreach (var player in players)
             {
@@ -27,7 +27,7 @@ namespace Tic_Tac_Toe_Web_API.Managers
             throw new Exception("Player doesn't exist!");
         }
 
-        public Player GetPlayer(int playerId)
+        public async Task<Player> GetPlayerAsync(int playerId)
         {
             foreach (var player in players)
             {
@@ -40,7 +40,7 @@ namespace Tic_Tac_Toe_Web_API.Managers
             throw new Exception("Player doesn't exist!");
         }
 
-        public bool CheckPlayerExist(string username)
+        public async Task<bool> CheckPlayerExistAsync(string username)
         {
             foreach (var player in players)
             {
@@ -53,9 +53,9 @@ namespace Tic_Tac_Toe_Web_API.Managers
             return false;
         }
 
-        public Player CreatePlayer(string username)
+        public async Task<Player> CreatePlayerAsync(string username)
         {
-            if (CheckPlayerExist(username))
+            if (await CheckPlayerExistAsync(username))
             {
                 throw new InvalidOperationException("User with this username already exist! Please choose another name!");
             }

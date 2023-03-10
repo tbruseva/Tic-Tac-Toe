@@ -17,12 +17,12 @@ namespace Tic_Tac_Toe_Web_API.Managers
 
         }
 
-        public List<IGame> GetAllGames()
+        public async Task<List<IGame>> GetAllGamesAsync()
         {
             return _allGames.ToList();
         }
 
-        public TicTacToeGame GetGameById(int id)
+        public async Task<TicTacToeGame> GetGameByIdAsync(int id)
         {
             var game = _allGames.Where(g => g.Id == id).Select(g => g as TicTacToeGame).FirstOrDefault();
             if (game == null)
@@ -34,7 +34,7 @@ namespace Tic_Tac_Toe_Web_API.Managers
         }
 
 
-        public IGame CreateGame()
+        public async Task<IGame> CreateGameAsync()
         {
             var game = new TicTacToeGame();
             _allGames.Add(game);
@@ -42,53 +42,53 @@ namespace Tic_Tac_Toe_Web_API.Managers
             return game;
         }
 
-        public IGame JoinGame(int gameId, Player player)
+        public async Task<IGame> JoinGameAsync(int gameId, Player player)
         {
-            var game = GetGame(gameId);
-            game.JoinGame(player);
+            var game = await GetGameAsync(gameId);
+            await game.JoinGameAsync(player);
 
             return game;
         }
 
 
-        public TicTacToeGame TicTacToeSelectMark(int gameId, int playerId, string playerMark)
+        public async Task<TicTacToeGame> TicTacToeSelectMarkAsync(int gameId, int playerId, string playerMark)
         {
-            var game = GetGame(gameId) as TicTacToeGame;
+            var game = await GetGameAsync(gameId) as TicTacToeGame;
 
             Mark selectedMark;
             Enum.TryParse(playerMark, true, out selectedMark);
 
-            game.SelectMark(playerId, selectedMark);
+            await game.SelectMarkAsync(playerId, selectedMark);
 
             return game;
         }
 
-        public TicTacToeGame TicTacToeRestartGame(int gameId, int playerId)
+        public async Task<TicTacToeGame> TicTacToeRestartGameAsync(int gameId, int playerId)
         {
 
-            var game = GetGame(gameId) as TicTacToeGame;
+            var game = await GetGameAsync(gameId) as TicTacToeGame;
 
-            if (playerId != game.Players[0].Id && playerId != game.Players[1].Id)
+            if (!game.Players.Exists(p => p.Id == playerId))
             {
                 throw new UnauthorizedAccessException("Only game players can restart the game!");
             }
 
-            game.RestartGame();
+            await game.RestartGameAsync();
 
             return game;
         }
 
-        public TicTacToeGame TicTacToeMakeMove(int gameId, int playerId, int rowPosition, int colPosition)
+        public async Task<TicTacToeGame> TicTacToeMakeMoveAsync(int gameId, int playerId, int rowPosition, int colPosition)
         {
-            var game = GetGame(gameId) as TicTacToeGame;
-            game.MakeMove(playerId, rowPosition, colPosition);
+            var game = await GetGameAsync(gameId) as TicTacToeGame;
+           await game.MakeMoveAsync(playerId, rowPosition, colPosition);
 
             return game;
         }
 
 
         #region Private methods
-        private IGame GetGame(int id)
+        private async Task<IGame> GetGameAsync(int id)
         {
             var game = _allGames.Where(g => g.Id == id).FirstOrDefault();
             if (game == null)

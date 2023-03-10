@@ -6,13 +6,13 @@ namespace Tic_Tac_Toe_Web_API.Managers.Interfaces
 {
     public interface IGameManager
     {
-        public IGame CreateGame();
-        public List<IGame> GetAllGames();
-        public TicTacToeGame GetGameById(int id);
-        public IGame JoinGame(int id, Player player);
-        public TicTacToeGame TicTacToeSelectMark(int gameId, int playerId, string mark);
-        public TicTacToeGame TicTacToeMakeMove(int gameId, int playerId, int rowPosition, int colPosition);
-        public TicTacToeGame TicTacToeRestartGame(int gameId, int playerId);
+        public Task<IGame> CreateGameAsync();
+        public Task<List<IGame>> GetAllGamesAsync();
+        public Task<TicTacToeGame> GetGameByIdAsync(int id);
+        public Task<IGame> JoinGameAsync(int id, Player player);
+        public Task<TicTacToeGame> TicTacToeSelectMarkAsync(int gameId, int playerId, string mark);
+        public Task<TicTacToeGame> TicTacToeMakeMoveAsync(int gameId, int playerId, int rowPosition, int colPosition);
+        public Task<TicTacToeGame> TicTacToeRestartGameAsync(int gameId, int playerId);
 
     }
 }

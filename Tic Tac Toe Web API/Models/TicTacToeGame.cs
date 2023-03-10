@@ -31,7 +31,7 @@ namespace Tic_Tac_Toe_Web_API.Models
             Name = "Tic-Tac-Toe";
         }
 
-        public void JoinGame(Player player)
+        public async Task JoinGameAsync(Player player)
         {
             if (this.GameStatus == GameStatus.NotStarted && this.Players.Count == 0)
             {
@@ -49,7 +49,7 @@ namespace Tic_Tac_Toe_Web_API.Models
             }
         }
 
-        public void MakeMove(int playerId, int rowPosition, int colPosition)
+        public async Task MakeMoveAsync(int playerId, int rowPosition, int colPosition)
         {
             var player = this.Players.Where(p => p.Id == playerId).FirstOrDefault();
             if (player == null)
@@ -58,17 +58,17 @@ namespace Tic_Tac_Toe_Web_API.Models
             }
             var currentPlayerId = this.Players[CurrentPlayerIndex].Id;
 
-            var position = this.CalculatePosition(rowPosition, colPosition);
+            var position = await this.CalculatePositionAsync(rowPosition, colPosition);
 
             if (currentPlayerId == player.Id && GameStatus == GameStatus.Started)
             {
-                var mark = GetMarkByPlayer(player.Id);
+                var mark = await GetMarkByPlayerAsync(player.Id);
 
                 if (Grid[position] == Mark.None)
                 {
                     Grid[position] = mark;
 
-                    if (this.CheckIfWin(mark))
+                    if (await this.CheckIfWinAsync(mark))
                     {
                         GameStatus = GameStatus.Finished;
                         if (mark == Mark.X)
@@ -105,7 +105,7 @@ namespace Tic_Tac_Toe_Web_API.Models
             }
         }
 
-        private Mark GetMarkByPlayer(int playerId)
+        private async Task<Mark> GetMarkByPlayerAsync(int playerId)
         {
             if (Players[PlayerXIndex].Id == playerId)
             {
@@ -115,14 +115,14 @@ namespace Tic_Tac_Toe_Web_API.Models
             return Mark.O;
         }
 
-        public void RestartGame()
+        public async Task RestartGameAsync()
         {
             GameStatus = GameStatus.Started;
             Grid = new Mark[9];
             CurrentPlayerIndex = 0;
         }
 
-        private bool CheckIfWin(Mark mark)
+        private async Task<bool> CheckIfWinAsync(Mark mark)
         {
             if ((Grid[0] == mark && Grid[1] == mark && Grid[2] == mark) ||
         (Grid[3] == mark && Grid[4] == mark && Grid[5] == mark) ||
@@ -139,13 +139,13 @@ namespace Tic_Tac_Toe_Web_API.Models
             return false;
         }
 
-        private int CalculatePosition(int row, int col)
+        private async Task<int> CalculatePositionAsync(int row, int col)
         {
             var position = (row * 3) + col;
             return position;
         }
 
-        public void SelectMark(int playerId, Mark mark)
+        public async Task SelectMarkAsync(int playerId, Mark mark)
         {
             if (mark != Mark.X && mark != Mark.O)
             {
