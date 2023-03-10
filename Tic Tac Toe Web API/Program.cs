@@ -1,3 +1,5 @@
+using Tic_Tac_Toe_Web_API.Managers;
+using Tic_Tac_Toe_Web_API.Managers.Interfaces;
 using Tic_Tac_Toe_Web_API.Models.Mappers;
 
 namespace Tic_Tac_Toe_Web_API

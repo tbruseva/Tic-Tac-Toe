@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
+using Tic_Tac_Toe_Web_API.Managers.Interfaces;
 using Tic_Tac_Toe_Web_API.Models.Interfaces;
+using Tic_Tac_Toe_Web_API.Models.Mappers;
 
 namespace Tic_Tac_Toe_Web_API.Controllers
 {
@@ -11,12 +13,12 @@ namespace Tic_Tac_Toe_Web_API.Controllers
     public class TicTacToeController : ControllerBase
     {
         private IGameManager _gameManager;
-        //private IPlayerManager _playerManager;
+        private TicTacToeGameMapper _gameMapper;
 
-        public TicTacToeController(IGameManager gameManager, IPlayerManager playerManager)
+        public TicTacToeController(IGameManager gameManager, TicTacToeGameMapper gameMapper)
         {
             _gameManager = gameManager;
-            //_playerManager = playerManager;
+            _gameMapper = gameMapper;
         }
 
         [Route("{gameId}")]
@@ -26,6 +28,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             try
             {
                 var game = _gameManager.GetGameById(gameId);
+                var responseDto = _gameMapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, game);
             }
@@ -41,8 +44,10 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var gameResponseDto = _gameManager.TicTacToeMakeMove(gameId, playerId, rowPosition, colPosition);
-                return StatusCode(200, gameResponseDto);
+                var game = _gameManager.TicTacToeMakeMove(gameId, playerId, rowPosition, colPosition);
+                var responseDto = _gameMapper.ConvertToResponseDto(game);
+
+                return StatusCode(200, responseDto);
             }
             catch (Exception ex)
             {
@@ -58,6 +63,8 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             try
             {
                 var game = _gameManager.TicTacToeSelectMark(gameId, playerId, mark);
+                var responseDto = _gameMapper.ConvertToResponseDto(game);
+
                 return StatusCode(200, game);
             }
             catch (Exception ex)
@@ -73,6 +80,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             try
             {
                 var game = _gameManager.TicTacToeRestartGame(gameId, playerId);
+                var responseDto = _gameMapper.ConvertToResponseDto(game);
                 return StatusCode(200, game);
             }
             catch (Exception ex)

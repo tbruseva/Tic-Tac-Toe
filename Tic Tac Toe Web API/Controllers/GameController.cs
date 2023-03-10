@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 using Tic_Tac_Toe_Web_API.Enums;
+using Tic_Tac_Toe_Web_API.Managers.Interfaces;
 using Tic_Tac_Toe_Web_API.Models;
 using Tic_Tac_Toe_Web_API.Models.Interfaces;
+using Tic_Tac_Toe_Web_API.Models.Mappers;
 
 namespace Tic_Tac_Toe_Web_API.Controllers
 {
@@ -13,11 +15,15 @@ namespace Tic_Tac_Toe_Web_API.Controllers
     {
         private IGameManager _gameManager;
         private IPlayerManager _playerManager;
+        private AllGamesMapper _allGamesMapper;
+        private PlayerMapper _playerMapper;
 
-        public GameController(IGameManager gameManager, IPlayerManager playerManager)
+        public GameController(IGameManager gameManager, IPlayerManager playerManager, AllGamesMapper gamesMapper, PlayerMapper playerMapper)
         {
             _gameManager = gameManager;
             _playerManager = playerManager;
+            _allGamesMapper= gamesMapper;
+            _playerMapper = playerMapper;
         }
 
         [Route("allGames")]
@@ -26,9 +32,9 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var listAllGames = _gameManager.GetAllGames();
+                var responseDto = _gameManager.GetAllGames().Select(g => _allGamesMapper.ConvertToResponseDto(g));
 
-                return StatusCode(200, listAllGames);
+                return StatusCode(200, responseDto);
             }
             catch (Exception ex)
             {
@@ -43,8 +49,9 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             try
             {
                 var game = _gameManager.CreateGame();
+                var responseDto = _allGamesMapper.ConvertToResponseDto(game);
 
-                return StatusCode(200, game);
+                return StatusCode(200, responseDto);
             }
             catch (Exception ex)
             {
@@ -59,7 +66,9 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             try
             {
                 var player = _playerManager.CreatePlayer(username);
-                return StatusCode(200, player);
+                var responseDto = _playerMapper.ConvertToResponseDto(player);
+
+                return StatusCode(200, responseDto);
             }
             catch (Exception ex)
             {
@@ -75,8 +84,9 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             {
                 var player = _playerManager.GetPlayer(playerId);
                 var game = _gameManager.JoinGame(gameId, player);
+                var responseDto = _allGamesMapper.ConvertToResponseDto(game);
 
-                return StatusCode(200, game);
+                return StatusCode(200, responseDto);
             }
             catch (Exception ex)
             {

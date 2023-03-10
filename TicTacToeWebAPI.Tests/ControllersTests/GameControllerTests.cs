@@ -8,12 +8,13 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
-using Tic_Tac_Toe_Web_API;
 using Tic_Tac_Toe_Web_API.Controllers;
 using Tic_Tac_Toe_Web_API.Enums;
+using Tic_Tac_Toe_Web_API.Managers.Interfaces;
 using Tic_Tac_Toe_Web_API.Models;
 using Tic_Tac_Toe_Web_API.Models.Dtos;
 using Tic_Tac_Toe_Web_API.Models.Interfaces;
+using Tic_Tac_Toe_Web_API.Models.Mappers;
 
 namespace TicTacToeWebAPI.Tests.ControllersTests
 {
@@ -23,6 +24,8 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         private GameController _controller;
         private Mock<IGameManager> _gameManager;
         private Mock<IPlayerManager> _playerManager;
+        private AllGamesMapper _gamesMapper;
+        private PlayerMapper _playerMapper;
 
         private static readonly Fixture _fixture = new Fixture ();
 
@@ -32,16 +35,19 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             // Arrange
             _gameManager= new Mock<IGameManager>();
             _playerManager= new Mock<IPlayerManager>();
-            _controller = new GameController(_gameManager.Object, _playerManager.Object);
+            _gamesMapper= new AllGamesMapper();
+            _playerMapper = new PlayerMapper();
+            _controller = new GameController(_gameManager.Object, _playerManager.Object, _gamesMapper, _playerMapper);
         }
 
         [Test]
-        public void AllGames_Should_Return_List_Of_All_Games_If_Any_Are_Created()
+        public void AllGames_Should_Return_ResponseDto()
         {
             //Arrange
-            var responseDto = _fixture.CreateMany<AllGamesResponseDto>(3).ToList();
+            var listAllGames = new List<IGame>();
 
-            _gameManager.Setup(g => g.GetAllGames()).Returns(responseDto);
+            _gameManager.Setup(g => g.GetAllGames()).Returns(listAllGames);
+            var responseDto = listAllGames.Select(g => _gamesMapper.ConvertToResponseDto(g));
 
             //Act
             var result = _controller.AllGames();
@@ -55,11 +61,13 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         }
 
         [Test]
-        public void AllGames_Should_Returns_Response_Dto()
+        public void AllGames_Should_Return_ResonseDto_With_Empty_List_If_No_Games_Are_Created()
         {
             //Arrange
-            var responseDto = new List<AllGamesResponseDto>();
-            _gameManager.Setup(g => g.GetAllGames()).Returns(responseDto);
+            var listAllGames = new List<IGame>();
+
+            _gameManager.Setup(g => g.GetAllGames()).Returns(listAllGames);
+            var responseDto = listAllGames.Select(g => _gamesMapper.ConvertToResponseDto(g));
 
             //Act
             var result = _controller.AllGames();
@@ -69,15 +77,16 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             Assert.IsInstanceOf<ObjectResult>(result);
 
             var okResult = result as ObjectResult;
-            Assert.That(okResult.Value, Is.EqualTo(responseDto));
+            Assert.AreEqual(responseDto, okResult.Value);
         }
 
         [Test]
         public void CreateGame_Should_Return_Created_Game()
         {
             //Arrange
-            var responseDto = _fixture.Create<AllGamesResponseDto>();
-            _gameManager.Setup(g => g.CreateGame()).Returns(responseDto);
+            var game = _fixture.Create<TicTacToeGame>();
+            _gameManager.Setup(g => g.CreateGame()).Returns(game);
+            var responseDto = _gamesMapper.ConvertToResponseDto(game);
 
             //Act
             var result = _controller.CreateGame();
@@ -90,14 +99,14 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             Assert.That(okResult.Value, Is.EqualTo(responseDto));
         }
 
-            [Test]
-        public void CreatePlayer_Should_Return_Created_Player_Details() 
+        [Test]
+        public void CreatePlayer_Should_Return_ResponseDto()
         {
             //Arrange
             string username = "to";
-            var player = new Player { Name= username };
-            var responseDto = new PlayerResponseDto { Id = player.Id, Name = player.Name };
-            _playerManager.Setup(g => g.CreatePlayer(username)).Returns(responseDto);
+            var player = _fixture.Build<Player>().With(p => p.Name, username).Create();
+            _playerManager.Setup(g => g.CreatePlayer(username)).Returns(player);
+            var responseDto = _playerMapper.ConvertToResponseDto(player);
 
             // Act
             var result = _controller.CreatePlayer(username);
@@ -133,12 +142,13 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         {
             //Arrange
             Player player = _fixture.Create<Player>();
-            var responseDto = _fixture.Create<AllGamesResponseDto>();
+            var game = _fixture.Create<TicTacToeGame>();
             _playerManager.Setup(g => g.GetPlayer(player.Id)).Returns(player);
-            _gameManager.Setup(g => g.JoinGame(responseDto.GameId, player)).Returns(responseDto);
+            _gameManager.Setup(g => g.JoinGame(game.Id, player)).Returns(game);
+            var responseDto = _gamesMapper.ConvertToResponseDto(game);
 
             //Act
-            var result = _controller.JoinGame(responseDto.GameId, player.Id);
+            var result = _controller.JoinGame(game.Id, player.Id);
 
             //Assert
             Assert.IsNotNull(result);
