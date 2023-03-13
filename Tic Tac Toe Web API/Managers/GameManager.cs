@@ -54,6 +54,10 @@ namespace Tic_Tac_Toe_Web_API.Managers
         public async Task<TicTacToeGame> TicTacToeSelectMarkAsync(int gameId, int playerId, string playerMark)
         {
             var game = await GetGameAsync(gameId) as TicTacToeGame;
+            if (game == null)
+            {
+                throw new InvalidDataException("Game with Id {gameId} doesn't exist!");
+            }
 
             Mark selectedMark;
             Enum.TryParse(playerMark, true, out selectedMark);
@@ -67,6 +71,10 @@ namespace Tic_Tac_Toe_Web_API.Managers
         {
 
             var game = await GetGameAsync(gameId) as TicTacToeGame;
+            if (game == null)
+            {
+                throw new InvalidDataException("Game with Id {gameId} doesn't exist!");
+            }
 
             if (!game.Players.Exists(p => p.Id == playerId))
             {
@@ -81,7 +89,11 @@ namespace Tic_Tac_Toe_Web_API.Managers
         public async Task<TicTacToeGame> TicTacToeMakeMoveAsync(int gameId, int playerId, int rowPosition, int colPosition)
         {
             var game = await GetGameAsync(gameId) as TicTacToeGame;
-           await game.MakeMoveAsync(playerId, rowPosition, colPosition);
+            if (game == null)
+            {
+                throw new InvalidDataException("Game with Id {gameId} doesn't exist!");
+            }
+            await game.MakeMoveAsync(playerId, rowPosition, colPosition);
 
             return game;
         }

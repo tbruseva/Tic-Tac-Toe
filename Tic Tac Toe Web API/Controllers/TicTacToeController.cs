@@ -65,7 +65,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
                 var game = await _gameManager.TicTacToeSelectMarkAsync(gameId, playerId, mark);
                 var responseDto = _gameMapper.ConvertToResponseDto(game);
 
-                return StatusCode(200, game);
+                return StatusCode(200, responseDto);
             }
             catch (Exception ex)
             {
@@ -81,7 +81,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             {
                 var game = await _gameManager.TicTacToeRestartGameAsync(gameId, playerId);
                 var responseDto = _gameMapper.ConvertToResponseDto(game);
-                return StatusCode(200, game);
+                return StatusCode(200, responseDto);
             }
             catch (Exception ex)
             {

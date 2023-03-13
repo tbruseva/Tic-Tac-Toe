@@ -16,6 +16,9 @@ namespace Tic_Tac_Toe_Web_API.Models
         public int MinPlayers { get; } = 2;
         public int MaxPlayers { get; } = 2;
         public Mark[] Grid { get; set; } = new Mark[9];
+        public List<List<int>> WinningCombinations { get; set; } = new List<List<int>> { new List<int> { 0, 1, 2 }, new List<int> { 3, 4, 5 }, new List<int> { 6, 7, 8 }, new List<int> { 0, 3, 6 }, new List<int> { 1, 4, 7 }, new List<int> { 2, 5, 8 }, new List<int> { 0, 4, 8 }, new List<int> { 2, 4, 6 } };
+        public List<int> WinCells { get; set; } = new List<int>();
+
         public int CounterWinX = 0;
         public int CounterWinO = 0;
         public int CounterDraw = 0;
@@ -119,21 +122,20 @@ namespace Tic_Tac_Toe_Web_API.Models
         {
             GameStatus = GameStatus.Started;
             Grid = new Mark[9];
+            WinCells.Clear();
             CurrentPlayerIndex = 0;
         }
 
         private async Task<bool> CheckIfWinAsync(Mark mark)
         {
-            if ((Grid[0] == mark && Grid[1] == mark && Grid[2] == mark) ||
-        (Grid[3] == mark && Grid[4] == mark && Grid[5] == mark) ||
-        (Grid[6] == mark && Grid[7] == mark && Grid[8] == mark) ||
-        (Grid[0] == mark && Grid[3] == mark && Grid[6] == mark) ||
-        (Grid[1] == mark && Grid[4] == mark && Grid[7] == mark) ||
-        (Grid[2] == mark && Grid[5] == mark && Grid[8] == mark) ||
-        (Grid[0] == mark && Grid[4] == mark && Grid[8] == mark) ||
-        (Grid[2] == mark && Grid[4] == mark && Grid[6] == mark))
+            foreach (var list in WinningCombinations)
             {
-                return true;
+                if (Grid[list[0]] != Mark.None && (Grid[list[0]] == Grid[list[1]]) && (Grid[list[0]] == Grid[list[2]]))
+                {
+                    WinCells.AddRange(list);
+                    return true;
+                }
+
             }
 
             return false;

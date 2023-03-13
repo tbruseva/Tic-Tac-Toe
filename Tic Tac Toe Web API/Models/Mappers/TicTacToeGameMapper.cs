@@ -17,6 +17,7 @@ namespace Tic_Tac_Toe_Web_API.Models.Mappers
             responseDto.PlayerX = playerX;
             responseDto.PlayerO = playerO;
             responseDto.Grid = game.Grid;
+            responseDto.WinCells = game.WinCells;
 
             return responseDto;
         }

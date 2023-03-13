@@ -9,5 +9,6 @@ namespace Tic_Tac_Toe_Web_API.Models.Dtos
         public Player? PlayerX { get; set; }
         public Player? PlayerO { get; set; }
         public int? CurrentPlayerId { get; set; }
+        public List<int> WinCells { get; set; } = new List<int>();
     }
 }
