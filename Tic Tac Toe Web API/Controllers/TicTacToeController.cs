@@ -40,7 +40,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         [Route("MakeMove")]
         [HttpPost]
-        public async Task<IActionResult> MakeMove([FromHeader] int playerId, int gameId, int rowPosition, int colPosition)
+        public async Task<IActionResult> MakeMove([FromHeader] int playerId, [FromHeader] int gameId, [FromHeader] int rowPosition, [FromHeader] int colPosition)
         {
             try
             {
