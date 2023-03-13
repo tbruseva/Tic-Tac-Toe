@@ -9,7 +9,7 @@ namespace Tic_Tac_Toe_Web_API.Managers
     {
         private List<Player> players = new List<Player>();
 
-        public PlayerManager(PlayerMapper playerMapper)
+        public PlayerManager()
         {
 
         }
@@ -53,8 +53,10 @@ namespace Tic_Tac_Toe_Web_API.Managers
             return false;
         }
 
-        public async Task<Player> CreatePlayerAsync(string username)
+        public async Task<Player> CreatePlayerAsync(string? username)
         {
+            username = string.IsNullOrEmpty(username) == false ? username : await GenerateUniqueUsernameAsync("Guest");
+
             if (await CheckPlayerExistAsync(username))
             {
                 throw new InvalidOperationException("User with this username already exist! Please choose another name!");
@@ -66,6 +68,22 @@ namespace Tic_Tac_Toe_Web_API.Managers
 
             return player;
         }
+
+        #region Private methods
+        private async Task<string> GenerateUniqueUsernameAsync(string baseUsername)
+        {
+            int playerIndex = 1;
+            string userName;
+
+            do
+            {
+                userName = baseUsername + (playerIndex++);
+            }
+            while (await CheckPlayerExistAsync(userName));
+
+            return userName;
+        }
+        #endregion
 
     }
 }

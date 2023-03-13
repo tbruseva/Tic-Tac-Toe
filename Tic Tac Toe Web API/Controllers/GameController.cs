@@ -33,8 +33,8 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                AllGamesResponseDto responseDto =  _gameManager.GetAllGamesAsync().Select(g => _allGamesMapper.ConvertToResponseDto(g));
-
+                var allGames = await _gameManager.GetAllGamesAsync();
+                var responseDto = allGames.Select(g => _allGamesMapper.ConvertToResponseDto(g));
                 return StatusCode(200, responseDto);
             }
             catch (Exception ex)
@@ -62,7 +62,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         [Route("Player")]
         [HttpPost]
-        public async Task<IActionResult> CreatePlayer([FromHeader] string username)
+        public async Task<IActionResult> CreatePlayer([FromHeader] string? username)
         {
             try
             {
