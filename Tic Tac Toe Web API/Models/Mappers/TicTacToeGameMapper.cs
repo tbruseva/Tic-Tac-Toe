@@ -12,7 +12,7 @@ namespace Tic_Tac_Toe_Web_API.Models.Mappers
             int? currentPlayerId = game.Players.ElementAtOrDefault(game.CurrentPlayerIndex) != null ? game.Players[game.CurrentPlayerIndex].Id : null;
 
             var responseDto = new TicTacToeGameResponseDto();
-            responseDto.GameId = game.Id;
+            responseDto.Id = game.Id;
             responseDto.CurrentPlayerId = currentPlayerId;
             responseDto.PlayerX = playerX;
             responseDto.PlayerO = playerO;
