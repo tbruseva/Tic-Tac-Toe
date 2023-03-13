@@ -16,7 +16,16 @@ namespace Tic_Tac_Toe_Web_API.Models
         public int MinPlayers { get; } = 2;
         public int MaxPlayers { get; } = 2;
         public Mark[] Grid { get; set; } = new Mark[9];
-        public List<List<int>> WinningCombinations { get; set; } = new List<List<int>> { new List<int> { 0, 1, 2 }, new List<int> { 3, 4, 5 }, new List<int> { 6, 7, 8 }, new List<int> { 0, 3, 6 }, new List<int> { 1, 4, 7 }, new List<int> { 2, 5, 8 }, new List<int> { 0, 4, 8 }, new List<int> { 2, 4, 6 } };
+        public int GameState { get; set; } = 0;
+        public List<List<int>> WinningCombinations { get; set; } = new List<List<int>> { 
+            new List<int> { 0, 1, 2 }, 
+            new List<int> { 3, 4, 5 }, 
+            new List<int> { 6, 7, 8 }, 
+            new List<int> { 0, 3, 6 }, 
+            new List<int> { 1, 4, 7 }, 
+            new List<int> { 2, 5, 8 }, 
+            new List<int> { 0, 4, 8 }, 
+            new List<int> { 2, 4, 6 } };
         public List<int> WinCells { get; set; } = new List<int>();
 
         public int CounterWinX = 0;
@@ -40,11 +49,13 @@ namespace Tic_Tac_Toe_Web_API.Models
             {
                 this.GameStatus = GameStatus.WaitingForOpponent;
                 this.Players.Add(player);
+                GameState++;
             }
             else if (this.GameStatus == GameStatus.WaitingForOpponent && this.Players.Count == 1)
             {
                 this.GameStatus = GameStatus.Started;
                 this.Players.Add(player);
+                GameState++;
             }
             else
             {
@@ -70,6 +81,7 @@ namespace Tic_Tac_Toe_Web_API.Models
                 if (Grid[position] == Mark.None)
                 {
                     Grid[position] = mark;
+                    GameState++; ;
 
                     if (await this.CheckIfWinAsync(mark))
                     {
@@ -77,15 +89,18 @@ namespace Tic_Tac_Toe_Web_API.Models
                         if (mark == Mark.X)
                         {
                             CounterWinX++;
+                            GameState++;
                         }
                         else if (mark == Mark.O)
                         {
                             CounterWinO++;
+                            GameState++;
                         }
                     }
                     else if (!Grid.Contains(Mark.None))
                     {
                         CounterDraw++;
+                        GameState++;
                     }
                 }
                 else
@@ -124,6 +139,7 @@ namespace Tic_Tac_Toe_Web_API.Models
             Grid = new Mark[9];
             WinCells.Clear();
             CurrentPlayerIndex = 0;
+            GameState++;
         }
 
         private async Task<bool> CheckIfWinAsync(Mark mark)
@@ -133,6 +149,8 @@ namespace Tic_Tac_Toe_Web_API.Models
                 if (Grid[list[0]] != Mark.None && (Grid[list[0]] == Grid[list[1]]) && (Grid[list[0]] == Grid[list[2]]))
                 {
                     WinCells.AddRange(list);
+                    GameState++;
+
                     return true;
                 }
 
@@ -162,6 +180,7 @@ namespace Tic_Tac_Toe_Web_API.Models
             {
                 this.PlayerXIndex = mark == Mark.X ? 0 : 1;
                 this.PlayerOIndex = mark == Mark.X ? 1 : 0;
+                GameState++;
             }
             else if (Players[1].Id == playerId)
             {
@@ -169,10 +188,10 @@ namespace Tic_Tac_Toe_Web_API.Models
             }
         }
 
-
-
+        public int GetState()
+        {
+            return GameState;
+        }
     }
-
-
 }
 

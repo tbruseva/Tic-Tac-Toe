@@ -88,5 +88,21 @@ namespace Tic_Tac_Toe_Web_API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [Route("GameState/{gameId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetStateLatestVersion(int gameId)
+        {
+            try
+            {
+                var state = _gameManager.GetGameState(gameId);
+
+                return StatusCode(200, state);
+            }
+            catch (Exception ex) 
+            { 
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
