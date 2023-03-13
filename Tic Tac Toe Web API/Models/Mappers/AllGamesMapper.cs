@@ -8,9 +8,9 @@ namespace Tic_Tac_Toe_Web_API.Models.Mappers
         public AllGamesResponseDto ConvertToResponseDto(IGame game)
         {
             var response = new AllGamesResponseDto();
-            response.GameId = game.Id;
-            response.GameName = game.Name;
-            response.GameStatus = game.GameStatus;
+            response.Id = game.Id;
+            response.Name = game.Name;
+            response.Status = game.GameStatus;
             response.MinPlayers = game.MinPlayers;
             response.MaxPlayers = game.MaxPlayers;
             response.Players = game.Players;
