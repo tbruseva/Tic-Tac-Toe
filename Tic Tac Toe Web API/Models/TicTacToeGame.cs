@@ -39,7 +39,7 @@ namespace Tic_Tac_Toe_Web_API.Models
 
         public TicTacToeGame()
         {
-            Id = ++uniqueId;
+            Id = Interlocked.Increment(ref uniqueId);
             Name = "Tic-Tac-Toe";
         }
 
