@@ -95,7 +95,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var state = _gameManager.GetGameState(gameId);
+                int state = await _gameManager.GetGameStateAsync(gameId);
 
                 return StatusCode(200, state);
             }

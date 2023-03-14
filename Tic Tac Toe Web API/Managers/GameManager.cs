@@ -91,16 +91,17 @@ namespace Tic_Tac_Toe_Web_API.Managers
             var game = await GetGameAsync(gameId) as TicTacToeGame;
             if (game == null)
             {
-                throw new InvalidDataException("Game with Id {gameId} doesn't exist!");
+                throw new InvalidDataException($"Game with Id {gameId} doesn't exist!");
             }
             await game.MakeMoveAsync(playerId, rowPosition, colPosition);
 
             return game;
         }
 
-        public async Task<int> GetGameState(int gameId)
+        public async Task<int> GetGameStateAsync(int gameId)
         {
             var game = await GetGameAsync(gameId) as TicTacToeGame;
+            
             var state = game.GetState();
 
             return state;
