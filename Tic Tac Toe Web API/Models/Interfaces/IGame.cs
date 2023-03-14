@@ -12,5 +12,6 @@ namespace Tic_Tac_Toe_Web_API.Models.Interfaces
         public string Name { get; set; }
         public List<Player> Players { get; set; }
         public Task JoinGameAsync(Player player);
+        public Task JoinGameAgainstComputerAsync(Player player);
     }
 }

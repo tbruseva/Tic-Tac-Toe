@@ -50,6 +50,13 @@ namespace Tic_Tac_Toe_Web_API.Managers
             return game;
         }
 
+        public async Task<IGame> JoinGameAgainstComputerAsync(int gameId, Player player)
+        {
+            var game = await GetGameAsync(gameId);
+            await game.JoinGameAgainstComputerAsync(player);
+
+            return game;
+        }
 
         public async Task<TicTacToeGame> TicTacToeSelectMarkAsync(int gameId, int playerId, string playerMark)
         {
@@ -94,6 +101,18 @@ namespace Tic_Tac_Toe_Web_API.Managers
                 throw new InvalidDataException($"Game with Id {gameId} doesn't exist!");
             }
             await game.MakeMoveAsync(playerId, rowPosition, colPosition);
+
+            return game;
+        }
+
+        public async Task<TicTacToeGame> TicTacToeMakeMoveAgainstComputerAsync(int gameId, int playerId, int rowPosition, int colPosition)
+        {
+            var game = await GetGameAsync(gameId) as TicTacToeGame;
+            if (game == null)
+            {
+                throw new InvalidDataException($"Game with Id {gameId} doesn't exist!");
+            }
+            await game.MakeMoveAgainstComputerAsync(playerId, rowPosition, colPosition);
 
             return game;
         }

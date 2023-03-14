@@ -95,5 +95,24 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             }
         }
 
+
+        [Route("JoinGameAgainstComputer/{gameId}")]
+        [HttpPost]
+        public async Task<IActionResult> JoinGameAgainstComputer([FromRoute] int gameId, [FromHeader] int playerId)
+        {
+            try
+            {
+                var player = await _playerManager.GetPlayerAsync(playerId);
+                var game = await _gameManager.JoinGameAgainstComputerAsync(gameId, player);
+                var responseDto = _allGamesMapper.ConvertToResponseDto(game);
+
+                return StatusCode(200, responseDto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

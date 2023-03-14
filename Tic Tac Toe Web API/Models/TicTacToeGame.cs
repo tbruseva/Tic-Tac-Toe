@@ -63,6 +63,20 @@ namespace Tic_Tac_Toe_Web_API.Models
             }
         }
 
+        public async Task JoinGameAgainstComputerAsync(Player player)
+        {
+            if (this.GameStatus == GameStatus.NotStarted && this.Players.Count == 0)
+            {
+                this.GameStatus = GameStatus.Started;
+                this.Players.Add(player);
+                GameState++;
+            }
+            else
+            {
+                throw new Exception("Game is already started! You can not join this game!");
+            }
+        }
+
         public async Task MakeMoveAsync(int playerId, int rowPosition, int colPosition)
         {
             var player = this.Players.Where(p => p.Id == playerId).FirstOrDefault();
@@ -75,6 +89,65 @@ namespace Tic_Tac_Toe_Web_API.Models
             var position = await this.CalculatePositionAsync(rowPosition, colPosition);
 
             if (currentPlayerId == player.Id && GameStatus == GameStatus.Started)
+            {
+                var mark = await GetMarkByPlayerAsync(player.Id);
+
+                if (Grid[position] == Mark.None)
+                {
+                    Grid[position] = mark;
+                    GameState++; ;
+
+                    if (await this.CheckIfWinAsync(mark))
+                    {
+                        GameStatus = GameStatus.Finished;
+                        if (mark == Mark.X)
+                        {
+                            CounterWinX++;
+                            GameState++;
+                        }
+                        else if (mark == Mark.O)
+                        {
+                            CounterWinO++;
+                            GameState++;
+                        }
+                    }
+                    else if (!Grid.Contains(Mark.None))
+                    {
+                        CounterDraw++;
+                        GameState++;
+                    }
+                }
+                else
+                {
+                    throw new Exception("Cell is already marked, please choose another cell!");
+                }
+
+                if (CurrentPlayerIndex == 0)
+                {
+                    CurrentPlayerIndex = 1;
+                }
+                else if (CurrentPlayerIndex == 1)
+                {
+                    CurrentPlayerIndex = 0;
+                }
+            }
+            else
+            {
+                throw new Exception("It is not your turn to make move or still waiting for opponent!");
+            }
+        }
+
+        public async Task MakeMoveAgainstComputerAsync(int playerId, int rowPosition, int colPosition)
+        {
+            var player = this.Players.Where(p => p.Id == playerId).FirstOrDefault();
+            if (player == null)
+            {
+                throw new UnauthorizedAccessException("Please join another game!");
+            }
+
+            var position = await this.CalculatePositionAsync(rowPosition, colPosition);
+
+            if (GameStatus == GameStatus.Started)
             {
                 var mark = await GetMarkByPlayerAsync(player.Id);
 
