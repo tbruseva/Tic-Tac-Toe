@@ -11,7 +11,7 @@ namespace Tic_Tac_Toe_Web_API.Models
 
         public Player()
         {
-            Id = ++UniqueId;
+            Id = Interlocked.Increment(ref UniqueId);
         }
 
     }

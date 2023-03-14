@@ -98,6 +98,14 @@ namespace Tic_Tac_Toe_Web_API.Managers
             return game;
         }
 
+        public async Task<int> GetGameState(int gameId)
+        {
+            var game = await GetGameAsync(gameId) as TicTacToeGame;
+            var state = game.GetState();
+
+            return state;
+        }
+
 
         #region Private methods
         private async Task<IGame> GetGameAsync(int id)
