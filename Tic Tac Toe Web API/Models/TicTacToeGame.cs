@@ -140,7 +140,8 @@ namespace Tic_Tac_Toe_Web_API.Models
 
         public async Task MakeMoveAgainstComputerAsync(int playerId, int rowPosition, int colPosition)
         {
-            var player = this.Players.Where(p => p.Id == playerId && p.Name != "Computer").FirstOrDefault();
+            var player = this.Players.Where(p => p.Id == playerId && p.Id != 0).FirstOrDefault();
+
             if (player == null)
             {
                 throw new InvalidDataException("Please enter valid player Id!");
@@ -192,7 +193,7 @@ namespace Tic_Tac_Toe_Web_API.Models
                     CurrentPlayerIndex = 0;
                 }
 
-                ComputerMakeMove();
+                await ComputerMakeMoveAsync();
             }
             else
             {
@@ -200,7 +201,7 @@ namespace Tic_Tac_Toe_Web_API.Models
             }
         }
 
-        public async Task ComputerMakeMove() 
+        public async Task ComputerMakeMoveAsync() 
         { 
             var computerId = this.Players.Where(p=>p.Name == "Computer").FirstOrDefault().Id;
             var mark = await GetMarkByPlayerAsync(computerId);
