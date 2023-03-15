@@ -140,10 +140,10 @@ namespace Tic_Tac_Toe_Web_API.Models
 
         public async Task MakeMoveAgainstComputerAsync(int playerId, int rowPosition, int colPosition)
         {
-            var player = this.Players.Where(p => p.Id == playerId).FirstOrDefault();
+            var player = this.Players.Where(p => p.Id == playerId && p.Name != "Computer").FirstOrDefault();
             if (player == null)
             {
-                throw new UnauthorizedAccessException("Please join another game!");
+                throw new InvalidDataException("Please enter valid player Id!");
             }
 
             var position = await this.CalculatePositionAsync(rowPosition, colPosition);
