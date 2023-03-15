@@ -69,7 +69,7 @@ namespace Tic_Tac_Toe_Web_API.Models
             {
                 this.GameStatus = GameStatus.Started;
                 this.Players.Add(player);
-                this.Players.Add(new Player { Name = "Computer" });
+                this.Players.Add(Player.Computer);
                 GameState++;
             }
             else
@@ -203,8 +203,7 @@ namespace Tic_Tac_Toe_Web_API.Models
 
         public async Task ComputerMakeMoveAsync() 
         { 
-            var computerId = this.Players.Where(p=>p.Name == "Computer").FirstOrDefault().Id;
-            var mark = await GetMarkByPlayerAsync(computerId);
+            var mark = await GetMarkByPlayerAsync(Player.Computer.Id);
             Random random = new Random();
             var position = random.Next(0, 8);
             while (Grid[position] != Mark.None)
