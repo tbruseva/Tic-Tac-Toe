@@ -8,10 +8,11 @@ namespace Tic_Tac_Toe_Web_API.Managers
     public class PlayerManager : IPlayerManager
     {
         private List<Player> players = new List<Player>();
+        
 
         public PlayerManager()
         {
-
+            players.Add(Player.Computer);
         }
 
         public async Task<Player> GetPlayerAsync(string username)

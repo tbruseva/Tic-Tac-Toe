@@ -100,19 +100,13 @@ namespace Tic_Tac_Toe_Web_API.Managers
             {
                 throw new InvalidDataException($"Game with Id {gameId} doesn't exist!");
             }
-            await game.MakeMoveAsync(playerId, rowPosition, colPosition);
-
-            return game;
-        }
-
-        public async Task<TicTacToeGame> TicTacToeMakeMoveAgainstComputerAsync(int gameId, int playerId, int rowPosition, int colPosition)
-        {
-            var game = await GetGameAsync(gameId) as TicTacToeGame;
-            if (game == null)
+            if (game.Players.Any(p => p.Id == 0))
             {
-                throw new InvalidDataException($"Game with Id {gameId} doesn't exist!");
+                await game.MakeMoveAgainstComputerAsync(playerId, rowPosition, colPosition);
+
+                return game;
             }
-            await game.MakeMoveAgainstComputerAsync(playerId, rowPosition, colPosition);
+            await game.MakeMoveAsync(playerId, rowPosition, colPosition);
 
             return game;
         }
