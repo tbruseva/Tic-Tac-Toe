@@ -56,7 +56,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         }
 
-        [Route("MakeMove")]
+        [Route("MakeMoveAgainstComputer")]
         [HttpPost]
         public async Task<IActionResult> MakeMoveAgainstComputer([FromHeader] int playerId, [FromHeader] int gameId, [FromHeader] int rowPosition, [FromHeader] int colPosition)
         {
