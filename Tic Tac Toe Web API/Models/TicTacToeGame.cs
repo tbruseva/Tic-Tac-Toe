@@ -69,6 +69,7 @@ namespace Tic_Tac_Toe_Web_API.Models
             {
                 this.GameStatus = GameStatus.Started;
                 this.Players.Add(player);
+                this.Players.Add(new Player { Name = "Computer" });
                 GameState++;
             }
             else
@@ -175,6 +176,7 @@ namespace Tic_Tac_Toe_Web_API.Models
                         CounterDraw++;
                         GameState++;
                     }
+                    
                 }
                 else
                 {
@@ -189,11 +191,34 @@ namespace Tic_Tac_Toe_Web_API.Models
                 {
                     CurrentPlayerIndex = 0;
                 }
+
+                ComputerMakeMove();
             }
             else
             {
                 throw new Exception("It is not your turn to make move or still waiting for opponent!");
             }
+        }
+
+        public async Task ComputerMakeMove() 
+        { 
+            var computerId = this.Players.Where(p=>p.Name == "Computer").FirstOrDefault().Id;
+            var mark = await GetMarkByPlayerAsync(computerId);
+            Random random = new Random();
+            var position = random.Next(0, 8);
+            while (Grid[position] != Mark.None)
+            {
+                position = random.Next(0, 8);
+            }
+            Grid[position] = mark;
+        }
+        public async Task RestartGameAsync()
+        {
+            GameStatus = GameStatus.Started;
+            Grid = new Mark[9];
+            WinCells.Clear();
+            CurrentPlayerIndex = 0;
+            GameState++;
         }
 
         private async Task<Mark> GetMarkByPlayerAsync(int playerId)
@@ -205,16 +230,6 @@ namespace Tic_Tac_Toe_Web_API.Models
 
             return Mark.O;
         }
-
-        public async Task RestartGameAsync()
-        {
-            GameStatus = GameStatus.Started;
-            Grid = new Mark[9];
-            WinCells.Clear();
-            CurrentPlayerIndex = 0;
-            GameState++;
-        }
-
         private async Task<bool> CheckIfWinAsync(Mark mark)
         {
             foreach (var list in WinningCombinations)
