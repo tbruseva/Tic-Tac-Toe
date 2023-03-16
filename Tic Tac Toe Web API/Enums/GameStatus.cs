@@ -4,6 +4,7 @@
     {
         NotStarted,
         WaitingForOpponent,
+        LoadedAgainstComputer,
         Started,
         Finished
     }

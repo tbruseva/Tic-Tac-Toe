@@ -71,7 +71,7 @@ namespace Tic_Tac_Toe_Web_API.Models
         {
             if (this.GameStatus == GameStatus.NotStarted && this.Players.Count == 0)
             {
-                this.GameStatus = GameStatus.Started;
+                this.GameStatus = GameStatus.LoadedAgainstComputer;
                 this.Players.Add(player);
                 this.Players.Add(Player.Computer);
                 counterWins.Add(player.Id, 0);
@@ -252,11 +252,19 @@ namespace Tic_Tac_Toe_Web_API.Models
                 throw new UnauthorizedAccessException("Please enter the game first!");
             }
 
-            if (Players[0].Id == playerId && (GameStatus == GameStatus.WaitingForOpponent || Players.Exists(p => p.Id == 0)))
+            if ((Players[0].Id == playerId && GameStatus == GameStatus.WaitingForOpponent) ||
+                 (Players.Exists(p => p.Id == 0) && GameStatus == GameStatus.LoadedAgainstComputer))
             {
                 this.PlayerXIndex = mark == Mark.X ? 0 : 1;
                 this.PlayerOIndex = mark == Mark.X ? 1 : 0;
                 GameState++;
+
+                if (mark == Mark.O)
+                {
+                    GameStatus = GameStatus.Started;
+                    await this.ComputerMakeMoveAsync();
+                    GameState++;
+                }
             }
             else if (Players[1].Id == playerId)
             {
