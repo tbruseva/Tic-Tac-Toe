@@ -71,7 +71,7 @@ namespace Tic_Tac_Toe_Web_API.Models
         {
             if (this.GameStatus == GameStatus.NotStarted && this.Players.Count == 0)
             {
-                this.GameStatus = GameStatus.LoadedAgainstComputer;
+                this.GameStatus = GameStatus.Started;
                 this.Players.Add(player);
                 this.Players.Add(Player.Computer);
                 counterWins.Add(player.Id, 0);
@@ -107,10 +107,16 @@ namespace Tic_Tac_Toe_Web_API.Models
 
                     if (await this.CheckIfWinAsync(mark))
                     {
-                        GameStatus = GameStatus.Finished;
                         counterWins[player.Id]++;
+                        GameStatus = GameStatus.Finished;
                         CounterTotal++;
-                        GameState++;
+                        GameState = 0;
+                    }
+                    else if (!Grid.Contains(Mark.None))
+                    {
+                        GameStatus = GameStatus.Finished;
+                        CounterTotal++;
+                        GameState = 0;
                     }
                 }
                 else
@@ -135,71 +141,10 @@ namespace Tic_Tac_Toe_Web_API.Models
 
         public async Task MakeMoveAgainstComputerAsync(int playerId, int rowPosition, int colPosition)
         {
-            var player = this.Players.Where(p => p.Id == playerId && p.Id != 0).FirstOrDefault();
-
-            if (player == null)
-            {
-                throw new InvalidDataException("Please enter valid player Id!");
-            }
-
-            var position = await this.CalculatePositionAsync(rowPosition, colPosition);
-
-            if (GameStatus == GameStatus.Started)
-            {
-                var mark = await GetMarkByPlayerAsync(player.Id);
-
-                if (Grid[position] == Mark.None)
-                {
-                    Grid[position] = mark;
-                    GameState++; ;
-
-                    if (await this.CheckIfWinAsync(mark))
-                    {
-                        GameStatus = GameStatus.Finished;
-                        counterWins[player.Id]++;
-                        CounterTotal++;
-                        GameState++;
-                    }
-                    else if (!Grid.Contains(Mark.None))
-                    {
-                        CounterTotal++;
-                        GameState++;
-                    }
-
-                }
-                else
-                {
-                    throw new Exception("Cell is already marked, please choose another cell!");
-                }
-
-                if (CurrentPlayerIndex == 0)
-                {
-                    CurrentPlayerIndex = 1;
-                }
-                else if (CurrentPlayerIndex == 1)
-                {
-                    CurrentPlayerIndex = 0;
-                }
-
-                await ComputerMakeMoveAsync();
-            }
-            else
-            {
-                throw new Exception("It is not your turn to make move or still waiting for opponent!");
-            }
+            await MakeMoveAsync(playerId, rowPosition, colPosition);
+            await ComputerMakeMoveAsync();
         }
 
-        public async Task ComputerMakeMoveAsync()
-        {
-            var mark = await GetMarkByPlayerAsync(Player.Computer.Id);
-            Random random = new Random();
-            var position = random.Next(0, 8);
-            while (Grid[position] != Mark.None)
-            {
-                position = random.Next(0, 8);
-            }
-            Grid[position] = mark;
-        }
         public async Task RestartGameAsync()
         {
             GameStatus = GameStatus.Started;
@@ -207,6 +152,25 @@ namespace Tic_Tac_Toe_Web_API.Models
             WinCells.Clear();
             CurrentPlayerIndex = 0;
             GameState++;
+        }
+
+        private async Task ComputerMakeMoveAsync()
+        {
+            var position = ComputerCalcPosition();
+            var row = (int)(position / 3);
+            var col = (int)(position % 3);
+            await MakeMoveAsync(Player.Computer.Id, row, col);
+        }
+
+        private int ComputerCalcPosition()
+        {
+            Random random = new Random();
+            var position = random.Next(0, 8);
+            while (Grid[position] != Mark.None)
+            {
+                position = random.Next(0, 8);
+            }
+            return position;
         }
 
         private async Task<Mark> GetMarkByPlayerAsync(int playerId)
@@ -252,8 +216,7 @@ namespace Tic_Tac_Toe_Web_API.Models
                 throw new UnauthorizedAccessException("Please enter the game first!");
             }
 
-            if ((Players[0].Id == playerId && GameStatus == GameStatus.WaitingForOpponent) ||
-                 (Players.Exists(p => p.Id == 0) && GameStatus == GameStatus.LoadedAgainstComputer))
+            if (Players[0].Id == playerId && (GameStatus == GameStatus.WaitingForOpponent || GameStatus == GameStatus.Finished))
             {
                 this.PlayerXIndex = mark == Mark.X ? 0 : 1;
                 this.PlayerOIndex = mark == Mark.X ? 1 : 0;
