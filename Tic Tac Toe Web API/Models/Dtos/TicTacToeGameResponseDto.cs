@@ -13,6 +13,6 @@ namespace Tic_Tac_Toe_Web_API.Models.Dtos
         public List<int> WinCells { get; set; } = new List<int>();
         public int GameState { get; set; }
         public Dictionary<int, int> CounterWins { get; set; }
-        public int counterTotalGamesPlayed { get; set; }
+        public int CounterTotalGamesPlayed { get; set; }
     }
 }
