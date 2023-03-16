@@ -17,20 +17,21 @@ namespace Tic_Tac_Toe_Web_API.Models
         public int MaxPlayers { get; } = 2;
         public Mark[] Grid { get; set; } = new Mark[9];
         public int GameState { get; set; } = 0;
-        public List<List<int>> WinningCombinations { get; set; } = new List<List<int>> { 
-            new List<int> { 0, 1, 2 }, 
-            new List<int> { 3, 4, 5 }, 
-            new List<int> { 6, 7, 8 }, 
-            new List<int> { 0, 3, 6 }, 
-            new List<int> { 1, 4, 7 }, 
-            new List<int> { 2, 5, 8 }, 
-            new List<int> { 0, 4, 8 }, 
+        public List<List<int>> WinningCombinations { get; set; } = new List<List<int>> {
+            new List<int> { 0, 1, 2 },
+            new List<int> { 3, 4, 5 },
+            new List<int> { 6, 7, 8 },
+            new List<int> { 0, 3, 6 },
+            new List<int> { 1, 4, 7 },
+            new List<int> { 2, 5, 8 },
+            new List<int> { 0, 4, 8 },
             new List<int> { 2, 4, 6 } };
         public List<int> WinCells { get; set; } = new List<int>();
 
-        public int CounterWinX = 0;
-        public int CounterWinO = 0;
-        public int CounterDraw = 0;
+        public Dictionary<int, int> counterWins = new Dictionary<int, int>();
+        //public int CounterWinX = 0;
+        //public int CounterWinO = 0;
+        public int CounterTotal = 0;
         public int CurrentPlayerIndex = 0;
         public int PlayerXIndex = 0;
         public int PlayerOIndex = 1;
@@ -49,12 +50,15 @@ namespace Tic_Tac_Toe_Web_API.Models
             {
                 this.GameStatus = GameStatus.WaitingForOpponent;
                 this.Players.Add(player);
+                counterWins.Add(player.Id, 0);
                 GameState++;
             }
             else if (this.GameStatus == GameStatus.WaitingForOpponent && this.Players.Count == 1)
             {
                 this.GameStatus = GameStatus.Started;
                 this.Players.Add(player);
+                counterWins.Add(player.Id, 0);
+
                 GameState++;
             }
             else
@@ -70,6 +74,9 @@ namespace Tic_Tac_Toe_Web_API.Models
                 this.GameStatus = GameStatus.Started;
                 this.Players.Add(player);
                 this.Players.Add(Player.Computer);
+                counterWins.Add(player.Id, 0);
+                counterWins.Add(Player.Computer.Id, 0);
+
                 GameState++;
             }
             else
@@ -101,20 +108,8 @@ namespace Tic_Tac_Toe_Web_API.Models
                     if (await this.CheckIfWinAsync(mark))
                     {
                         GameStatus = GameStatus.Finished;
-                        if (mark == Mark.X)
-                        {
-                            CounterWinX++;
-                            GameState++;
-                        }
-                        else if (mark == Mark.O)
-                        {
-                            CounterWinO++;
-                            GameState++;
-                        }
-                    }
-                    else if (!Grid.Contains(Mark.None))
-                    {
-                        CounterDraw++;
+                        counterWins[player.Id]++;
+                        CounterTotal++;
                         GameState++;
                     }
                 }
@@ -161,23 +156,16 @@ namespace Tic_Tac_Toe_Web_API.Models
                     if (await this.CheckIfWinAsync(mark))
                     {
                         GameStatus = GameStatus.Finished;
-                        if (mark == Mark.X)
-                        {
-                            CounterWinX++;
-                            GameState++;
-                        }
-                        else if (mark == Mark.O)
-                        {
-                            CounterWinO++;
-                            GameState++;
-                        }
+                        counterWins[player.Id]++;
+                        CounterTotal++;
+                        GameState++;
                     }
                     else if (!Grid.Contains(Mark.None))
                     {
-                        CounterDraw++;
+                        CounterTotal++;
                         GameState++;
                     }
-                    
+
                 }
                 else
                 {
@@ -201,8 +189,8 @@ namespace Tic_Tac_Toe_Web_API.Models
             }
         }
 
-        public async Task ComputerMakeMoveAsync() 
-        { 
+        public async Task ComputerMakeMoveAsync()
+        {
             var mark = await GetMarkByPlayerAsync(Player.Computer.Id);
             Random random = new Random();
             var position = random.Next(0, 8);
@@ -264,7 +252,7 @@ namespace Tic_Tac_Toe_Web_API.Models
                 throw new UnauthorizedAccessException("Please enter the game first!");
             }
 
-            if (Players[0].Id == playerId && GameStatus == GameStatus.WaitingForOpponent)
+            if (Players[0].Id == playerId && (GameStatus == GameStatus.WaitingForOpponent || Players.Exists(p => p.Id == 0)))
             {
                 this.PlayerXIndex = mark == Mark.X ? 0 : 1;
                 this.PlayerOIndex = mark == Mark.X ? 1 : 0;
