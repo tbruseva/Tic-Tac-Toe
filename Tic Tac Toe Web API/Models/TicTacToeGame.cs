@@ -158,12 +158,13 @@ namespace Tic_Tac_Toe_Web_API.Models
                         GameStatus = GameStatus.Finished;
                         counterWins[player.Id]++;
                         CounterTotal++;
-                        GameState++;
+                        GameState = 0;
                     }
                     else if (!Grid.Contains(Mark.None))
                     {
+                        GameStatus = GameStatus.Finished;
                         CounterTotal++;
-                        GameState++;
+                        GameState = 0;
                     }
 
                 }
@@ -253,7 +254,7 @@ namespace Tic_Tac_Toe_Web_API.Models
             }
 
             if ((Players[0].Id == playerId && GameStatus == GameStatus.WaitingForOpponent) ||
-                 (Players.Exists(p => p.Id == 0) && GameStatus == GameStatus.LoadedAgainstComputer))
+                 (Players.Exists(p => p.Id == Player.Computer.Id) && GameStatus == GameStatus.LoadedAgainstComputer))
             {
                 this.PlayerXIndex = mark == Mark.X ? 0 : 1;
                 this.PlayerOIndex = mark == Mark.X ? 1 : 0;
