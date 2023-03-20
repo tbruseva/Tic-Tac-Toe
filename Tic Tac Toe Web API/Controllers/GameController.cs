@@ -27,9 +27,9 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             _playerMapper = playerMapper;
         }
 
-        [Route("allGames")]
+        [Route("Games")]
         [HttpGet]
-        public async Task<IActionResult> AllGames()
+        public async Task<IActionResult> allGames()
         {
             try
             {
@@ -43,7 +43,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             }
         }
 
-        [Route("CreateGame")]
+        [Route("")]
         [HttpPost]
         public async Task<IActionResult> CreateGame()
         {
@@ -79,12 +79,12 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         [Route("JoinGame/{gameId}")]
         [HttpPost]
-        public async Task <IActionResult> JoinGame([FromRoute] int gameId, [FromHeader] int playerId)
+        public async Task <IActionResult> JoinGame([FromRoute] int gameId, [FromHeader] int playerId, [FromHeader] bool auto = false)
         {
             try
             {
                 var player = await _playerManager.GetPlayerAsync(playerId);
-                var game = await _gameManager.JoinGameAsync(gameId, player);
+                var game = (auto == false) ? await _gameManager.JoinGameAsync(gameId, player) : await _gameManager.JoinGameAgainstComputerAsync(gameId, player);
                 var responseDto = _allGamesMapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, responseDto);

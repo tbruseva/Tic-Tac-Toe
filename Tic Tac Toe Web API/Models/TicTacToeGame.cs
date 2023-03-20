@@ -17,20 +17,21 @@ namespace Tic_Tac_Toe_Web_API.Models
         public int MaxPlayers { get; } = 2;
         public Mark[] Grid { get; set; } = new Mark[9];
         public int GameState { get; set; } = 0;
-        public List<List<int>> WinningCombinations { get; set; } = new List<List<int>> { 
-            new List<int> { 0, 1, 2 }, 
-            new List<int> { 3, 4, 5 }, 
-            new List<int> { 6, 7, 8 }, 
-            new List<int> { 0, 3, 6 }, 
-            new List<int> { 1, 4, 7 }, 
-            new List<int> { 2, 5, 8 }, 
-            new List<int> { 0, 4, 8 }, 
+        public List<List<int>> WinningCombinations { get; set; } = new List<List<int>> {
+            new List<int> { 0, 1, 2 },
+            new List<int> { 3, 4, 5 },
+            new List<int> { 6, 7, 8 },
+            new List<int> { 0, 3, 6 },
+            new List<int> { 1, 4, 7 },
+            new List<int> { 2, 5, 8 },
+            new List<int> { 0, 4, 8 },
             new List<int> { 2, 4, 6 } };
         public List<int> WinCells { get; set; } = new List<int>();
 
-        public int CounterWinX = 0;
-        public int CounterWinO = 0;
-        public int CounterDraw = 0;
+        public Dictionary<int, int> counterWins = new Dictionary<int, int>();
+        //public int CounterWinX = 0;
+        //public int CounterWinO = 0;
+        public int CounterTotal = 0;
         public int CurrentPlayerIndex = 0;
         public int PlayerXIndex = 0;
         public int PlayerOIndex = 1;
@@ -49,12 +50,15 @@ namespace Tic_Tac_Toe_Web_API.Models
             {
                 this.GameStatus = GameStatus.WaitingForOpponent;
                 this.Players.Add(player);
+                counterWins.Add(player.Id, 0);
                 GameState++;
             }
             else if (this.GameStatus == GameStatus.WaitingForOpponent && this.Players.Count == 1)
             {
                 this.GameStatus = GameStatus.Started;
                 this.Players.Add(player);
+                counterWins.Add(player.Id, 0);
+
                 GameState++;
             }
             else
@@ -69,7 +73,10 @@ namespace Tic_Tac_Toe_Web_API.Models
             {
                 this.GameStatus = GameStatus.Started;
                 this.Players.Add(player);
-                this.Players.Add(new Player { Name = "Computer" });
+                this.Players.Add(Player.Computer);
+                counterWins.Add(player.Id, 0);
+                counterWins.Add(Player.Computer.Id, 0);
+
                 GameState++;
             }
             else
@@ -100,22 +107,16 @@ namespace Tic_Tac_Toe_Web_API.Models
 
                     if (await this.CheckIfWinAsync(mark))
                     {
+                        counterWins[player.Id]++;
                         GameStatus = GameStatus.Finished;
-                        if (mark == Mark.X)
-                        {
-                            CounterWinX++;
-                            GameState++;
-                        }
-                        else if (mark == Mark.O)
-                        {
-                            CounterWinO++;
-                            GameState++;
-                        }
+                        CounterTotal++;
+                        GameState = 0;
                     }
                     else if (!Grid.Contains(Mark.None))
                     {
-                        CounterDraw++;
-                        GameState++;
+                        GameStatus = GameStatus.Finished;
+                        CounterTotal++;
+                        GameState = 0;
                     }
                 }
                 else
@@ -140,78 +141,10 @@ namespace Tic_Tac_Toe_Web_API.Models
 
         public async Task MakeMoveAgainstComputerAsync(int playerId, int rowPosition, int colPosition)
         {
-            var player = this.Players.Where(p => p.Id == playerId && p.Name != "Computer").FirstOrDefault();
-            if (player == null)
-            {
-                throw new InvalidDataException("Please enter valid player Id!");
-            }
-
-            var position = await this.CalculatePositionAsync(rowPosition, colPosition);
-
-            if (GameStatus == GameStatus.Started)
-            {
-                var mark = await GetMarkByPlayerAsync(player.Id);
-
-                if (Grid[position] == Mark.None)
-                {
-                    Grid[position] = mark;
-                    GameState++; ;
-
-                    if (await this.CheckIfWinAsync(mark))
-                    {
-                        GameStatus = GameStatus.Finished;
-                        if (mark == Mark.X)
-                        {
-                            CounterWinX++;
-                            GameState++;
-                        }
-                        else if (mark == Mark.O)
-                        {
-                            CounterWinO++;
-                            GameState++;
-                        }
-                    }
-                    else if (!Grid.Contains(Mark.None))
-                    {
-                        CounterDraw++;
-                        GameState++;
-                    }
-                    
-                }
-                else
-                {
-                    throw new Exception("Cell is already marked, please choose another cell!");
-                }
-
-                if (CurrentPlayerIndex == 0)
-                {
-                    CurrentPlayerIndex = 1;
-                }
-                else if (CurrentPlayerIndex == 1)
-                {
-                    CurrentPlayerIndex = 0;
-                }
-
-                ComputerMakeMove();
-            }
-            else
-            {
-                throw new Exception("It is not your turn to make move or still waiting for opponent!");
-            }
+            await MakeMoveAsync(playerId, rowPosition, colPosition);
+            await ComputerMakeMoveAsync();
         }
 
-        public async Task ComputerMakeMove() 
-        { 
-            var computerId = this.Players.Where(p=>p.Name == "Computer").FirstOrDefault().Id;
-            var mark = await GetMarkByPlayerAsync(computerId);
-            Random random = new Random();
-            var position = random.Next(0, 8);
-            while (Grid[position] != Mark.None)
-            {
-                position = random.Next(0, 8);
-            }
-            Grid[position] = mark;
-        }
         public async Task RestartGameAsync()
         {
             GameStatus = GameStatus.Started;
@@ -219,6 +152,25 @@ namespace Tic_Tac_Toe_Web_API.Models
             WinCells.Clear();
             CurrentPlayerIndex = 0;
             GameState++;
+        }
+
+        private async Task ComputerMakeMoveAsync()
+        {
+            var position = ComputerCalcPosition();
+            var row = (int)(position / 3);
+            var col = (int)(position % 3);
+            await MakeMoveAsync(Player.Computer.Id, row, col);
+        }
+
+        private int ComputerCalcPosition()
+        {
+            Random random = new Random();
+            var position = random.Next(0, 8);
+            while (Grid[position] != Mark.None)
+            {
+                position = random.Next(0, 8);
+            }
+            return position;
         }
 
         private async Task<Mark> GetMarkByPlayerAsync(int playerId)
@@ -264,11 +216,18 @@ namespace Tic_Tac_Toe_Web_API.Models
                 throw new UnauthorizedAccessException("Please enter the game first!");
             }
 
-            if (Players[0].Id == playerId && GameStatus == GameStatus.WaitingForOpponent)
+            if (Players[0].Id == playerId && (GameStatus == GameStatus.WaitingForOpponent || GameStatus == GameStatus.Finished))
             {
                 this.PlayerXIndex = mark == Mark.X ? 0 : 1;
                 this.PlayerOIndex = mark == Mark.X ? 1 : 0;
                 GameState++;
+
+                if (mark == Mark.O)
+                {
+                    GameStatus = GameStatus.Started;
+                    await this.ComputerMakeMoveAsync();
+                    GameState++;
+                }
             }
             else if (Players[1].Id == playerId)
             {

@@ -20,6 +20,8 @@ namespace Tic_Tac_Toe_Web_API.Models.Mappers
             responseDto.WinCells = game.WinCells;
             responseDto.Status = game.GameStatus;
             responseDto.GameState = game.GameState;
+            responseDto.CounterWins = game.counterWins;
+            responseDto.CounterTotalGamesPlayed = game.CounterTotal;
 
             return responseDto;
         }

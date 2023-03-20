@@ -56,24 +56,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         }
 
-        [Route("MakeMoveAgainstComputer")]
-        [HttpPost]
-        public async Task<IActionResult> MakeMoveAgainstComputer([FromHeader] int playerId, [FromHeader] int gameId, [FromHeader] int rowPosition, [FromHeader] int colPosition)
-        {
-            try
-            {
-                var game = await _gameManager.TicTacToeMakeMoveAgainstComputerAsync(gameId, playerId, rowPosition, colPosition);
-                var responseDto = _gameMapper.ConvertToResponseDto(game);
-
-                return StatusCode(200, responseDto);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
-        }
-
+        
         [Route("SelectMark/{gameId}")]
         [HttpPost]
         public async Task<IActionResult> SelectMark([FromRoute] int gameId, [FromHeader] int playerId, [FromBody] string mark)
