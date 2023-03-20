@@ -28,9 +28,7 @@ namespace Tic_Tac_Toe_Web_API.Models
             new List<int> { 2, 4, 6 } };
         public List<int> WinCells { get; set; } = new List<int>();
 
-        public Dictionary<int, int> counterWins = new Dictionary<int, int>();
-        //public int CounterWinX = 0;
-        //public int CounterWinO = 0;
+        public Dictionary<int, int> CounterWins { get; set; } = new Dictionary<int, int>();
         public int CounterTotal = 0;
         public int CurrentPlayerIndex = 0;
         public int PlayerXIndex = 0;
@@ -50,14 +48,14 @@ namespace Tic_Tac_Toe_Web_API.Models
             {
                 this.GameStatus = GameStatus.WaitingForOpponent;
                 this.Players.Add(player);
-                counterWins.Add(player.Id, 0);
+                CounterWins.Add(player.Id, 0);
                 GameState++;
             }
             else if (this.GameStatus == GameStatus.WaitingForOpponent && this.Players.Count == 1)
             {
                 this.GameStatus = GameStatus.Started;
                 this.Players.Add(player);
-                counterWins.Add(player.Id, 0);
+                CounterWins.Add(player.Id, 0);
 
                 GameState++;
             }
@@ -74,8 +72,8 @@ namespace Tic_Tac_Toe_Web_API.Models
                 this.GameStatus = GameStatus.Started;
                 this.Players.Add(player);
                 this.Players.Add(Player.Computer);
-                counterWins.Add(player.Id, 0);
-                counterWins.Add(Player.Computer.Id, 0);
+                CounterWins.Add(player.Id, 0);
+                CounterWins.Add(Player.Computer.Id, 0);
 
                 GameState++;
             }
@@ -107,7 +105,7 @@ namespace Tic_Tac_Toe_Web_API.Models
 
                     if (await this.CheckIfWinAsync(mark))
                     {
-                        counterWins[player.Id]++;
+                        CounterWins[player.Id]++;
                         GameStatus = GameStatus.Finished;
                         CounterTotal++;
                         GameState = 0;

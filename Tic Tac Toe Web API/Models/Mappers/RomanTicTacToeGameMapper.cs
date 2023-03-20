@@ -2,16 +2,15 @@
 
 namespace Tic_Tac_Toe_Web_API.Models.Mappers
 {
-    public class TicTacToeGameMapper
+    public class RomanTicTacToeGameMapper
     {
-
-    public TicTacToeGameResponseDto ConvertToResponseDto(TicTacToeGame game) 
+        public RomanTicTacToeResponseDto ConvertToResponseDto(RomanTicTacToeGame game)
         {
             Player? playerX = game.Players.ElementAtOrDefault(game.PlayerXIndex) != null ? game.Players[game.PlayerXIndex] : null;
             Player? playerO = game.Players.ElementAtOrDefault(game.PlayerOIndex) != null ? game.Players[game.PlayerOIndex] : null;
             int? currentPlayerId = game.Players.ElementAtOrDefault(game.CurrentPlayerIndex) != null ? game.Players[game.CurrentPlayerIndex].Id : null;
 
-            var responseDto = new TicTacToeGameResponseDto();
+            var responseDto = new RomanTicTacToeResponseDto();
             responseDto.Id = game.Id;
             responseDto.CurrentPlayerId = currentPlayerId;
             responseDto.PlayerX = playerX;
@@ -21,7 +20,7 @@ namespace Tic_Tac_Toe_Web_API.Models.Mappers
             responseDto.Status = game.GameStatus;
             responseDto.GameState = game.GameState;
             responseDto.CounterWins = game.CounterWins;
-            responseDto.CounterTotalGamesPlayed = game.CounterTotal;
+            responseDto.CounterTotalGamesPlayed = game.CounterTotalGames;
 
             return responseDto;
         }

@@ -1,25 +1,22 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System;
 using Tic_Tac_Toe_Web_API.Managers.Interfaces;
 using Tic_Tac_Toe_Web_API.Models;
-using Tic_Tac_Toe_Web_API.Models.Interfaces;
 using Tic_Tac_Toe_Web_API.Models.Mappers;
 
 namespace Tic_Tac_Toe_Web_API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class TicTacToeController : ControllerBase
+    public class RomanTicTacToeController : Controller
     {
         private IGameManager _gameManager;
-        private TicTacToeGameMapper _gameMapper;
+        private RomanTicTacToeGameMapper _mapper;
 
-        public TicTacToeController(IGameManager gameManager, TicTacToeGameMapper gameMapper)
+        public RomanTicTacToeController(IGameManager gameManager, RomanTicTacToeGameMapper mapper)
         {
             _gameManager = gameManager;
-            _gameMapper = gameMapper;
+            _mapper = mapper;
         }
 
         [Route("{gameId}")]
@@ -29,7 +26,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             try
             {
                 var game = await _gameManager.GetGameByIdAsync(gameId);
-                var responseDto = _gameMapper.ConvertToResponseDto((TicTacToeGame)game );
+                var responseDto = _mapper.ConvertToResponseDto((RomanTicTacToeGame)game);
 
                 return StatusCode(200, responseDto);
             }
@@ -41,12 +38,12 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         [Route("MakeMove")]
         [HttpPost]
-        public async Task<IActionResult> MakeMove([FromHeader] int playerId, [FromHeader] int gameId, [FromHeader] int rowPosition, [FromHeader] int colPosition)
+        public async Task<IActionResult> MakeMove([FromHeader] int playerId, [FromHeader] int gameId, [FromHeader] int position)
         {
             try
             {
-                var game = await _gameManager.TicTacToeMakeMoveAsync(gameId, playerId, rowPosition, colPosition);
-                var responseDto = _gameMapper.ConvertToResponseDto(game);
+                var game = await _gameManager.RomanTicTacToeMakeMoveAsync(gameId, playerId, position);
+                var responseDto = _mapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, responseDto);
             }
@@ -57,15 +54,15 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         }
 
-        
+
         [Route("SelectMark/{gameId}")]
         [HttpPost]
         public async Task<IActionResult> SelectMark([FromRoute] int gameId, [FromHeader] int playerId, [FromBody] string mark)
         {
             try
             {
-                var game = await _gameManager.TicTacToeSelectMarkAsync(gameId, playerId, mark);
-                var responseDto = _gameMapper.ConvertToResponseDto(game);
+                var game = await _gameManager.RomanTicTacToeSelectMarkAsync(gameId, playerId, mark);
+                var responseDto = _mapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, responseDto);
             }
@@ -81,8 +78,8 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = await _gameManager.TicTacToeRestartGameAsync(gameId, playerId);
-                var responseDto = _gameMapper.ConvertToResponseDto(game);
+                var game = await _gameManager.RomanTicTacToeRestartGameAsync(gameId, playerId);
+                var responseDto = _mapper.ConvertToResponseDto(game);
                 return StatusCode(200, responseDto);
             }
             catch (Exception ex)
@@ -97,12 +94,12 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                int state = await _gameManager.TicTacToeGetGameStateAsync(gameId);
+                int state = await _gameManager.RomanTicTacToeGetGameStateAsync(gameId);
 
                 return StatusCode(200, state);
             }
-            catch (Exception ex) 
-            { 
+            catch (Exception ex)
+            {
                 return BadRequest(ex.Message);
             }
         }
