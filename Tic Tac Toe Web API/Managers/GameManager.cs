@@ -24,7 +24,7 @@ namespace Tic_Tac_Toe_Web_API.Managers
 
         public async Task<IGame> GetGameByIdAsync(int id)
         {
-            var game = _allGames.Where(g => g.Id == id).Select(g => g as TicTacToeGame).FirstOrDefault();
+            var game = _allGames.Where(g => g.Id == id).FirstOrDefault();
             if (game == null)
             {
                 throw new Exception("Game doesn't exist!");
@@ -34,9 +34,9 @@ namespace Tic_Tac_Toe_Web_API.Managers
         }
 
 
-        public async Task<IGame> CreateGameAsync()
+        public async Task<IGame> CreateGameAsync(string name)
         {
-            var game = new TicTacToeGame();
+            IGame game = (name == "Tic-Tac-Toe") ? new TicTacToeGame() : new RomanTicTacToeGame();
             _allGames.Add(game);
 
             return game;
@@ -54,6 +54,14 @@ namespace Tic_Tac_Toe_Web_API.Managers
         {
             var game = await GetGameAsync(gameId);
             await game.JoinGameAgainstComputerAsync(player);
+
+            return game;
+        }
+
+        public async Task<RomanTicTacToeGame> AddPawnAsync(int gameId,int playerId, int position)
+        {
+            var game = await GetGameAsync(gameId) as RomanTicTacToeGame;
+            await game.AddPawnAsync(playerId, position);
 
             return game;
         }
@@ -128,15 +136,15 @@ namespace Tic_Tac_Toe_Web_API.Managers
             return game;
         }
 
-        public async Task<RomanTicTacToeGame> RomanTicTacToeMakeMoveAsync(int gameId, int playerId, int position)
+        public async Task<RomanTicTacToeGame> RomanTicTacToeMakeMoveAsync(int gameId, int playerId, int oldPosition, int newPosition)
         {
             var game = await GetGameAsync(gameId) as RomanTicTacToeGame;
             if (game == null)
             {
                 throw new InvalidDataException($"Game with Id {gameId} doesn't exist!");
-            } 
+            }
 
-            await game.MakeMoveAsync(playerId, position);
+            await game.MakeMoveAsync(playerId, oldPosition, newPosition);
 
             return game;
         }
@@ -162,7 +170,7 @@ namespace Tic_Tac_Toe_Web_API.Managers
         public async Task<int> TicTacToeGetGameStateAsync(int gameId)
         {
             var game = await GetGameAsync(gameId) as TicTacToeGame;
-            
+
             var state = game.GetState();
 
             return state;

@@ -45,11 +45,11 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         [Route("")]
         [HttpPost]
-        public async Task<IActionResult> CreateGame()
+        public async Task<IActionResult> CreateGame([FromHeader] string name)
         {
             try
             {
-                var game = await _gameManager.CreateGameAsync();
+                var game = await _gameManager.CreateGameAsync(name);
                 var responseDto = _allGamesMapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, responseDto);

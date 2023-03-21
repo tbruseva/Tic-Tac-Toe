@@ -1,38 +1,152 @@
-﻿using Tic_Tac_Toe_Web_API.Enums;
+﻿using System.Xml;
+using Tic_Tac_Toe_Web_API.Enums;
 using Tic_Tac_Toe_Web_API.Models.Interfaces;
 
 namespace Tic_Tac_Toe_Web_API.Models
 {
-    public class RomanTicTacToeGame : IGame
+    public class RomanTicTacToeGame : TicTacToe, IGame
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
+        //public string Name { get; } = "Roman-Tic-Tac-Toe";
         public List<Player> Players { get; set; } = new List<Player>();
         public int MinPlayers { get; set; } = 2;
         public int MaxPlayers { get; set; } = 2;
-
-        public int PlayerXIndex { get; set; }
-        public int PlayerOIndex { get; set; }
-        public int CurrentPlayerIndex { get;set; }
+        public int CurrentPlayerIndex { get; set; }
         public GameStatus GameStatus { get; set; }
         public Mark[] Grid { get; set; } = new Mark[9];
+        public int PlayerXPawns { get; set; } = 3;
+        public int PlayerOPawns { get; set; } = 3;
         public List<int> WinCells { get; set; } = new List<int>();
-        public Dictionary<int, int> CounterWins { get; set; }
+        public Dictionary<int, int> CounterWins { get; set; } = new Dictionary<int, int>();
         public int CounterTotalGames { get; set; }
         public int GameState { get; set; } = 0;
+        public List<List<int>> WinningCombinations { get; set; } = new List<List<int>> {
+            new List<int> { 1, 2, 3 },
+            new List<int> { 2, 3, 4 },
+            new List<int> { 3, 4, 5 },
+            new List<int> { 4, 5, 6 },
+            new List<int> { 6, 7, 8 },
+            new List<int> { 1, 2, 8 }};
+
+        public int PlayerXIndex = 0;
+        public int PlayerOIndex = 1;
+
+
+        public RomanTicTacToeGame()
+        {
+            Name = "Roman-Tic-Tac-Toe";
+        }
+
         public Task JoinGameAgainstComputerAsync(Player player)
         {
             throw new NotImplementedException();
         }
 
-        public Task JoinGameAsync(Player player)
+        public async Task JoinGameAsync(Player player)
         {
-            throw new NotImplementedException();
+            if (this.GameStatus == GameStatus.NotStarted && this.Players.Count == 0)
+            {
+                this.GameStatus = GameStatus.WaitingForOpponent;
+                this.Players.Add(player);
+                CounterWins.Add(player.Id, 0);
+                GameState++;
+            }
+            else if (this.GameStatus == GameStatus.WaitingForOpponent && this.Players.Count == 1)
+            {
+                this.GameStatus = GameStatus.Started;
+                this.Players.Add(player);
+                CounterWins.Add(player.Id, 0);
+
+                GameState++;
+            }
+            else
+            {
+                throw new Exception("Game is already started! You can not join this game!");
+            }
         }
 
-        public Task MakeMoveAsync(int playerId, int position)
+        public async Task AddPawnAsync(int playerId, int position)
         {
-            throw new NotImplementedException();
+            var player = this.Players.Where(p => p.Id == playerId).FirstOrDefault();
+            if (player == null)
+            {
+                throw new UnauthorizedAccessException("Please join another game!");
+            }
+            var currentPlayerId = this.Players[CurrentPlayerIndex].Id;
+            if (currentPlayerId == player.Id && GameStatus == GameStatus.Started &&
+                PlayerXPawns > 0 && PlayerOPawns > 0)
+            {
+                var mark = await GetMarkByPlayerAsync(player.Id);
+                if (Grid[position] == Mark.None)
+                {
+                    Grid[position] = mark;
+                    PlayerXPawns = (mark == Mark.X) ? PlayerXPawns-- : PlayerOPawns--;
+                    GameState++;
+                }
+                else
+                {
+                    throw new Exception("Cell is already marked, please choose another cell!");
+                }
+
+                if (CurrentPlayerIndex == 0)
+                {
+                    CurrentPlayerIndex = 1;
+                }
+                else if (CurrentPlayerIndex == 1)
+                {
+                    CurrentPlayerIndex = 0;
+                }
+            }
+            else
+            {
+                throw new Exception("It is not your turn to add a pawn or your pawns have finished!");
+            }
+        }
+
+        public async Task MakeMoveAsync(int playerId, int oldPosition, int newPosition)
+        {
+            var player = this.Players.Where(p => p.Id == playerId).FirstOrDefault();
+            if (player == null)
+            {
+                throw new UnauthorizedAccessException("Please join another game!");
+            }
+            var currentPlayerId = this.Players[CurrentPlayerIndex].Id;
+
+            if (currentPlayerId == player.Id && GameStatus == GameStatus.Started)
+            {
+                var mark = await GetMarkByPlayerAsync(player.Id);
+
+                if (Grid[newPosition] == Mark.None && (newPosition == oldPosition - 1 || newPosition == oldPosition + 1 || oldPosition == 0 || newPosition == 0))
+                {
+                    Grid[newPosition] = mark;
+                    Grid[oldPosition] = Mark.None;
+                    GameState++; ;
+
+                    if (await this.CheckIfWinAsync(mark))
+                    {
+                        CounterWins[player.Id]++;
+                        GameStatus = GameStatus.Finished;
+                        CounterTotalGames++;
+                        GameState = 0;
+                    }
+                }
+                else
+                {
+                    throw new Exception("Please choose another cell!");
+                }
+
+                if (CurrentPlayerIndex == 0)
+                {
+                    CurrentPlayerIndex = 1;
+                }
+                else if (CurrentPlayerIndex == 1)
+                {
+                    CurrentPlayerIndex = 0;
+                }
+            }
+            else
+            {
+                throw new Exception("It is not your turn to make move or still waiting for opponent!");
+            }
         }
 
         public async Task SelectMarkAsync(int playerId, Mark mark)
@@ -78,5 +192,34 @@ namespace Tic_Tac_Toe_Web_API.Models
         {
             return GameState;
         }
+
+        #region Private methods
+        private async Task<Mark> GetMarkByPlayerAsync(int playerId)
+        {
+            if (Players[PlayerXIndex].Id == playerId)
+            {
+                return Mark.X;
+            }
+
+            return Mark.O;
+        }
+
+        private async Task<bool> CheckIfWinAsync(Mark mark)
+        {
+            foreach (var list in WinningCombinations)
+            {
+                if (Grid[list[0]] != Mark.None && (Grid[list[0]] == Grid[list[1]]) && (Grid[list[0]] == Grid[list[2]]))
+                {
+                    WinCells.AddRange(list);
+                    GameState++;
+
+                    return true;
+                }
+
+            }
+
+            return false;
+        }
+        #endregion
     }
 }

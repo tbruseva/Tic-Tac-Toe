@@ -36,13 +36,30 @@ namespace Tic_Tac_Toe_Web_API.Controllers
             }
         }
 
-        [Route("MakeMove")]
+        [Route("AddPawn")]
         [HttpPost]
-        public async Task<IActionResult> MakeMove([FromHeader] int playerId, [FromHeader] int gameId, [FromHeader] int position)
+        public async Task<IActionResult> AddPawn([FromHeader] int gameId,[FromHeader] int playerId, [FromHeader] int position)
         {
             try
             {
-                var game = await _gameManager.RomanTicTacToeMakeMoveAsync(gameId, playerId, position);
+                var game = await _gameManager.AddPawnAsync(gameId, playerId, position);
+                var responseDto = _mapper.ConvertToResponseDto(game);
+
+                return StatusCode(200, responseDto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Route("MakeMove")]
+        [HttpPost]
+        public async Task<IActionResult> MakeMove([FromHeader] int playerId, [FromHeader] int gameId, [FromHeader] int oldPosition, int newPosition)
+        {
+            try
+            {
+                var game = await _gameManager.RomanTicTacToeMakeMoveAsync(gameId, playerId, oldPosition, newPosition);
                 var responseDto = _mapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, responseDto);
