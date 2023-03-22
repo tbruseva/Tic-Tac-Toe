@@ -22,9 +22,9 @@ namespace Tic_Tac_Toe_Web_API.Managers
             return _allGames.ToList();
         }
 
-        public async Task<IGame> GetGameByIdAsync(int id)
+        public async Task<TicTacToe> GetGameByIdAsync(int id)
         {
-            var game = _allGames.Where(g => g.Id == id).FirstOrDefault();
+            var game = _allGames.Where(g => g.Id == id).Select(g => g as TicTacToe).FirstOrDefault();
             if (game == null)
             {
                 throw new Exception("Game doesn't exist!");

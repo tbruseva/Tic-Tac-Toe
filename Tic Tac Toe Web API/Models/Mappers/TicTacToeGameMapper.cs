@@ -21,7 +21,7 @@ namespace Tic_Tac_Toe_Web_API.Models.Mappers
             responseDto.Status = game.GameStatus;
             responseDto.GameState = game.GameState;
             responseDto.CounterWins = game.CounterWins;
-            responseDto.CounterTotalGamesPlayed = game.CounterTotal;
+            responseDto.CounterTotalGamesPlayed = game.CounterTotalGames;
 
             return responseDto;
         }
