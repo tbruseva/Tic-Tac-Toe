@@ -28,8 +28,13 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = await _gameManager.GetGameByIdAsync(gameId);
-                var responseDto = _gameMapper.ConvertToResponseDto((TicTacToeGame)game );
+                var game = await _gameManager.GetGameByIdAsync(gameId) as TicTacToeGame;
+
+                if (game == null)
+                {
+                    throw new Exception("Game is not from type TicTacToe");
+                }
+                var responseDto = _gameMapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, responseDto);
             }

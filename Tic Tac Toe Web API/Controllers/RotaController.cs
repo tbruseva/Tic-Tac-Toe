@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using Tic_Tac_Toe_Web_API.Managers.Interfaces;
 using Tic_Tac_Toe_Web_API.Models;
 using Tic_Tac_Toe_Web_API.Models.Mappers;
@@ -8,12 +9,12 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class RomanTicTacToeController : Controller
+    public class RotaController : Controller
     {
         private IGameManager _gameManager;
         private RomanTicTacToeGameMapper _mapper;
 
-        public RomanTicTacToeController(IGameManager gameManager, RomanTicTacToeGameMapper mapper)
+        public RotaController(IGameManager gameManager, RomanTicTacToeGameMapper mapper)
         {
             _gameManager = gameManager;
             _mapper = mapper;
@@ -25,8 +26,13 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = await _gameManager.GetGameByIdAsync(gameId);
-                var responseDto = _mapper.ConvertToResponseDto((RomanTicTacToeGame)game);
+                var game = await _gameManager.GetGameByIdAsync(gameId) as RotaGame;
+                if (game == null)
+                {
+                    throw new Exception("Game is not from type RomanTicTacToe");
+                }
+
+                var responseDto = _mapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, responseDto);
             }
@@ -59,7 +65,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = await _gameManager.RomanTicTacToeMakeMoveAsync(gameId, playerId, oldPosition, newPosition);
+                var game = await _gameManager.RotaMakeMoveAsync(gameId, playerId, oldPosition, newPosition);
                 var responseDto = _mapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, responseDto);
@@ -78,7 +84,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = await _gameManager.RomanTicTacToeSelectMarkAsync(gameId, playerId, mark);
+                var game = await _gameManager.RotaSelectMarkAsync(gameId, playerId, mark);
                 var responseDto = _mapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, responseDto);
@@ -95,7 +101,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = await _gameManager.RomanTicTacToeRestartGameAsync(gameId, playerId);
+                var game = await _gameManager.RotaRestartGameAsync(gameId, playerId);
                 var responseDto = _mapper.ConvertToResponseDto(game);
                 return StatusCode(200, responseDto);
             }
@@ -111,7 +117,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                int state = await _gameManager.RomanTicTacToeGetGameStateAsync(gameId);
+                int state = await _gameManager.RotaGetGameStateAsync(gameId);
 
                 return StatusCode(200, state);
             }

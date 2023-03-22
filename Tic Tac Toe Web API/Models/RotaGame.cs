@@ -4,7 +4,7 @@ using Tic_Tac_Toe_Web_API.Models.Interfaces;
 
 namespace Tic_Tac_Toe_Web_API.Models
 {
-    public class RomanTicTacToeGame : TicTacToe
+    public class RotaGame : TicTacToe
     {
         public int PlayerXPawns { get; set; } = 3;
         public int PlayerOPawns { get; set; } = 3;
@@ -19,7 +19,7 @@ namespace Tic_Tac_Toe_Web_API.Models
         };
 
 
-        public RomanTicTacToeGame()
+        public RotaGame()
         {
             Name = "Roman-Tic-Tac-Toe";
         }

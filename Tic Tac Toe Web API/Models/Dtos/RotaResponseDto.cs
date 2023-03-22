@@ -2,7 +2,7 @@
 
 namespace Tic_Tac_Toe_Web_API.Models.Dtos
 {
-    public class RomanTicTacToeResponseDto
+    public class RotaResponseDto
     {
         public int Id { get; set; }
         public Mark[] Grid { get; set; } = new Mark[9];
