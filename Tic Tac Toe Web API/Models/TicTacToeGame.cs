@@ -24,24 +24,41 @@ namespace Tic_Tac_Toe_Web_API.Models
             Name = "Tic-Tac-Toe";
         }
 
-        public async Task JoinGameAgainstComputerAsync(Player player)
+        public override async Task SelectMarkAsync(int playerId, Mark mark)
         {
-            if (this.GameStatus == GameStatus.NotStarted && this.Players.Count == 0)
+            if (mark != Mark.X && mark != Mark.O)
             {
-                this.GameStatus = GameStatus.Started;
-                this.Players.Add(player);
-                this.Players.Add(Player.Computer);
-                CounterWins.Add(player.Id, 0);
-                CounterWins.Add(Player.Computer.Id, 0);
+                throw new InvalidDataException("Entered symbol is not valid! Please select X or O !");
+            }
+            if (!Players.Exists(p => p.Id == playerId))
+            {
+                throw new UnauthorizedAccessException("Please enter the game first!");
+            }
 
+            if (Players.Any(p => p.Id == playerId) && (GameStatus == GameStatus.WaitingForOpponent
+                || GameStatus == GameStatus.Finished
+                || Players.Any(p => p.Id == Player.Computer.Id)))
+            {
+                this.PlayerXIndex = mark == Mark.X ? 0 : 1;
+                this.PlayerOIndex = mark == Mark.X ? 1 : 0;
                 GameState++;
+
+                if (mark == Mark.O)
+                {
+                    GameStatus = GameStatus.Started;
+                    await this.ComputerMakeMoveAsync();
+                    GameState++;
+                }
+            }
+            else if (Players[1].Id == playerId)
+            {
+                throw new UnauthorizedAccessException("Only first player entered the game can select a mark!");
             }
             else
             {
-                throw new Exception("Game is already started! You can not join this game!");
+                throw new AccessViolationException("You cannot select a mark after the game has started!");
             }
         }
-
         public override async Task MakeMoveAsync(int playerId, int rowPosition, int colPosition)
         {
             var player = this.Players.Where(p => p.Id == playerId).FirstOrDefault();
@@ -96,13 +113,13 @@ namespace Tic_Tac_Toe_Web_API.Models
             }
         }
 
-        public async Task MakeMoveAgainstComputerAsync(int playerId, int rowPosition, int colPosition)
+        public override async Task MakeMoveAgainstComputerAsync(int playerId, int rowPosition, int colPosition)
         {
             await MakeMoveAsync(playerId, rowPosition, colPosition);
             await ComputerMakeMoveAsync();
         }
 
-        private async Task ComputerMakeMoveAsync()
+        public override async Task ComputerMakeMoveAsync()
         {
             var position = ComputerCalcPosition();
             var row = (int)(position / 3);
@@ -110,6 +127,7 @@ namespace Tic_Tac_Toe_Web_API.Models
             await MakeMoveAsync(Player.Computer.Id, row, col);
         }
 
+        #region Private methods
         private int ComputerCalcPosition()
         {
             Random random = new Random();
@@ -128,6 +146,7 @@ namespace Tic_Tac_Toe_Web_API.Models
             return position;
         }
 
+        #endregion
     }
 }
 

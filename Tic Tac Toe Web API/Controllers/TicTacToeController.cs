@@ -69,7 +69,11 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = await _gameManager.TicTacToeSelectMarkAsync(gameId, playerId, mark);
+                var game = await _gameManager.SelectMarkAsync(gameId, playerId, mark) as TicTacToeGame;
+                if (game == null)
+                {
+                    throw new Exception("Game doesn't exist!");
+                }
                 var responseDto = _gameMapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, responseDto);
@@ -86,7 +90,11 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = await _gameManager.TicTacToeRestartGameAsync(gameId, playerId);
+                var game = await _gameManager.RestartGameAsync(gameId, playerId) as TicTacToeGame;
+                if (game == null)
+                {
+                    throw new Exception("Game doesn't exist!");
+                }
                 var responseDto = _gameMapper.ConvertToResponseDto(game);
                 return StatusCode(200, responseDto);
             }
@@ -102,7 +110,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                int state = await _gameManager.TicTacToeGetGameStateAsync(gameId);
+                int state = await _gameManager.GetGameStateAsync(gameId);
 
                 return StatusCode(200, state);
             }

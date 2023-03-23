@@ -51,9 +51,22 @@ namespace Tic_Tac_Toe_Web_API.Models
             }
         }
 
-        public Task JoinGameAgainstComputerAsync(Player player)
+        public virtual async Task JoinGameAgainstComputerAsync(Player player)
         {
-            throw new NotImplementedException();
+            if (this.GameStatus == GameStatus.NotStarted && this.Players.Count == 0)
+            {
+                this.GameStatus = GameStatus.Started;
+                this.Players.Add(player);
+                this.Players.Add(Player.Computer);
+                CounterWins.Add(player.Id, 0);
+                CounterWins.Add(Player.Computer.Id, 0);
+
+                GameState++;
+            }
+            else
+            {
+                throw new Exception("Game is already started! You can not join this game!");
+            }
         }
 
         public abstract Task MakeMoveAsync(int playerId, int rowPosition, int colPosition);
@@ -67,40 +80,11 @@ namespace Tic_Tac_Toe_Web_API.Models
             GameState++;
         }
 
+        public abstract Task SelectMarkAsync(int playerId, Mark mark);
 
-        public virtual async Task SelectMarkAsync(int playerId, Mark mark)
-        {
-            if (mark != Mark.X && mark != Mark.O)
-            {
-                throw new InvalidDataException("Entered symbol is not valid! Please select X or O !");
-            }
-            if (!Players.Exists(p => p.Id == playerId))
-            {
-                throw new UnauthorizedAccessException("Please enter the game first!");
-            }
+        public abstract Task MakeMoveAgainstComputerAsync(int playerId, int rowPosition, int colPosition);
 
-            if (Players[0].Id == playerId && (GameStatus == GameStatus.WaitingForOpponent || GameStatus == GameStatus.Finished))
-            {
-                this.PlayerXIndex = mark == Mark.X ? 0 : 1;
-                this.PlayerOIndex = mark == Mark.X ? 1 : 0;
-                GameState++;
-
-                if (mark == Mark.O)
-                {
-                    GameStatus = GameStatus.Started;
-                    //await this.ComputerMakeMoveAsync();
-                    GameState++;
-                }
-            }
-            else if (Players[1].Id == playerId)
-            {
-                throw new UnauthorizedAccessException("Only first player entered the game can select a mark!");
-            }
-            else
-            {
-                throw new AccessViolationException("You cannot select a mark after the game has started!");
-            }
-        }
+        public abstract Task ComputerMakeMoveAsync();
 
         public int GetState()
         {

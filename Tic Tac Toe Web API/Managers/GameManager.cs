@@ -57,17 +57,21 @@ namespace Tic_Tac_Toe_Web_API.Managers
             return game;
         }
 
-        public async Task<RotaGame> AddPawnAsync(int gameId,int playerId, int position)
+        public async Task<RotaGame> AddPawnAsync(int gameId, int playerId, int position)
         {
             var game = await GetGameAsync(gameId) as RotaGame;
+            if (game == null)
+            {
+                throw new Exception("Game doesn't exist!");
+            }
             await game.AddPawnAsync(playerId, position);
 
             return game;
         }
 
-        public async Task<TicTacToeGame> TicTacToeSelectMarkAsync(int gameId, int playerId, string playerMark)
+        public async Task<IGame> SelectMarkAsync(int gameId, int playerId, string playerMark)
         {
-            var game = await GetGameAsync(gameId) as TicTacToeGame;
+            var game = await GetGameAsync(gameId) as TicTacToe;
             if (game == null)
             {
                 throw new InvalidDataException("Game with Id {gameId} doesn't exist!");
@@ -81,45 +85,10 @@ namespace Tic_Tac_Toe_Web_API.Managers
             return game;
         }
 
-        public async Task<RotaGame> RotaSelectMarkAsync(int gameId, int playerId, string playerMark)
-        {
-            var game = await GetGameAsync(gameId) as RotaGame;
-            if (game == null)
-            {
-                throw new InvalidDataException("Game with Id {gameId} doesn't exist!");
-            }
-
-            Mark selectedMark;
-            Enum.TryParse(playerMark, true, out selectedMark);
-
-            await game.SelectMarkAsync(playerId, selectedMark);
-
-            return game;
-        }
-
-        public async Task<TicTacToeGame> TicTacToeRestartGameAsync(int gameId, int playerId)
+        public async Task<IGame> RestartGameAsync(int gameId, int playerId)
         {
 
-            var game = await GetGameAsync(gameId) as TicTacToeGame;
-            if (game == null)
-            {
-                throw new InvalidDataException("Game with Id {gameId} doesn't exist!");
-            }
-
-            if (!game.Players.Exists(p => p.Id == playerId))
-            {
-                throw new UnauthorizedAccessException("Only game players can restart the game!");
-            }
-
-            await game.RestartGameAsync();
-
-            return game;
-        }
-
-        public async Task<RotaGame> RotaRestartGameAsync(int gameId, int playerId)
-        {
-
-            var game = await GetGameAsync(gameId) as RotaGame;
+            var game = await GetGameAsync(gameId) as TicTacToe;
             if (game == null)
             {
                 throw new InvalidDataException("Game with Id {gameId} doesn't exist!");
@@ -166,17 +135,9 @@ namespace Tic_Tac_Toe_Web_API.Managers
             return game;
         }
 
-        public async Task<int> TicTacToeGetGameStateAsync(int gameId)
+        public async Task<int> GetGameStateAsync(int gameId)
         {
-            var game = await GetGameAsync(gameId) as TicTacToeGame;
-
-            var state = game.GetState();
-
-            return state;
-        }
-        public async Task<int> RotaGetGameStateAsync(int gameId)
-        {
-            var game = await GetGameAsync(gameId) as TicTacToeGame;
+            var game = await GetGameAsync(gameId) as TicTacToe;
 
             var state = game.GetState();
 

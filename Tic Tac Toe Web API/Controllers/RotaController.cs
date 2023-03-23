@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using Tic_Tac_Toe_Web_API.Managers.Interfaces;
 using Tic_Tac_Toe_Web_API.Models;
+using Tic_Tac_Toe_Web_API.Models.Interfaces;
 using Tic_Tac_Toe_Web_API.Models.Mappers;
 
 namespace Tic_Tac_Toe_Web_API.Controllers
@@ -29,7 +30,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
                 var game = await _gameManager.GetGameByIdAsync(gameId) as RotaGame;
                 if (game == null)
                 {
-                    throw new Exception("Game is not from type RomanTicTacToe");
+                    throw new Exception("Game is not from type Rota");
                 }
 
                 var responseDto = _mapper.ConvertToResponseDto(game);
@@ -84,7 +85,11 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = await _gameManager.RotaSelectMarkAsync(gameId, playerId, mark);
+                var game = await _gameManager.SelectMarkAsync(gameId, playerId, mark) as RotaGame;
+                if (game == null)
+                {
+                    throw new Exception("Game doesn't exist!");
+                }
                 var responseDto = _mapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, responseDto);
@@ -101,7 +106,11 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = await _gameManager.RotaRestartGameAsync(gameId, playerId);
+                var game = await _gameManager.RestartGameAsync(gameId, playerId) as RotaGame;
+                if (game == null)
+                {
+                    throw new Exception("Game doesn't exist!");
+                }
                 var responseDto = _mapper.ConvertToResponseDto(game);
                 return StatusCode(200, responseDto);
             }
@@ -117,7 +126,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                int state = await _gameManager.RotaGetGameStateAsync(gameId);
+                int state = await _gameManager.GetGameStateAsync(gameId);
 
                 return StatusCode(200, state);
             }

@@ -21,16 +21,45 @@ namespace Tic_Tac_Toe_Web_API.Models
 
         public RotaGame()
         {
-            Name = "Roman-Tic-Tac-Toe";
+            Name = "Rota";
         }
 
-        public Task JoinGameAgainstComputerAsync(Player player)
+        public override async Task SelectMarkAsync(int playerId, Mark mark)
         {
-            throw new NotImplementedException();
+            if (mark != Mark.X && mark != Mark.O)
+            {
+                throw new InvalidDataException("Entered symbol is not valid! Please select X or O !");
+            }
+            if (!Players.Exists(p => p.Id == playerId))
+            {
+                throw new UnauthorizedAccessException("Please enter the game first!");
+            }
+
+            if (Players.Any(p => p.Id == playerId) && (GameStatus == GameStatus.WaitingForOpponent
+                || GameStatus == GameStatus.Finished
+                || Players.Any(p => p.Id == Player.Computer.Id)))
+            {
+                this.PlayerXIndex = mark == Mark.X ? 0 : 1;
+                this.PlayerOIndex = mark == Mark.X ? 1 : 0;
+                GameState++;
+
+                if (mark == Mark.O)
+                {
+                    Random random= new Random();
+                    var position = random.Next(0, 9);
+                    await this.AddPawnAsync(Player.Computer.Id, position);
+                    GameState++;
+                }
+            }
+            else if (Players[1].Id == playerId)
+            {
+                throw new UnauthorizedAccessException("Only first player entered the game can select a mark!");
+            }
+            else
+            {
+                throw new AccessViolationException("You cannot select a mark after the game has started!");
+            }
         }
-
-
-
         public async Task AddPawnAsync(int playerId, int position)
         {
             var player = this.Players.Where(p => p.Id == playerId).FirstOrDefault();
@@ -116,8 +145,49 @@ namespace Tic_Tac_Toe_Web_API.Models
             }
         }
 
-        #region Private methods
+        public override async Task MakeMoveAgainstComputerAsync(int playerId, int oldPosition, int newPosition)
+        {
+            await MakeMoveAsync(playerId, oldPosition, newPosition);
+            await ComputerMakeMoveAsync();
+        }
 
+        public override async Task ComputerMakeMoveAsync()
+        {
+            var positions = await ComputerCalcPosition();
+            await MakeMoveAsync(Player.Computer.Id, positions.oldPosition, positions.newPosition);
+        }
+
+        #region Private methods
+        private async Task<(int oldPosition, int newPosition)> ComputerCalcPosition()
+        {
+            var mark = await GetMarkByPlayerAsync(Player.Computer.Id);
+            List<int> positionsComputerMarks = new List<int>();
+            List<Mark> possibleNewPositions = new List<Mark>();
+            for (int i = 0; i < Grid.Length; i++)
+            {
+                if (Grid[i] == mark)
+                {
+                    positionsComputerMarks.Add(i);
+                }
+            }
+            Random random = new Random();
+            var oldPosition = random.Next(0, positionsComputerMarks.Count);
+            while (Grid[oldPosition - 1] != Mark.None || Grid[oldPosition + 1] != Mark.None || Grid[0] != Mark.None)
+            {
+                oldPosition = random.Next(0, positionsComputerMarks.Count);
+            }
+            possibleNewPositions.Add(Grid[oldPosition-1]);
+            possibleNewPositions.Add(Grid[oldPosition+1]);
+            possibleNewPositions.Add(Grid[0]);
+
+            var newPosition = random.Next(0, possibleNewPositions.Count);
+            while (Grid[newPosition] != Mark.None)
+            {
+                newPosition = random.Next(0, positionsComputerMarks.Count);
+            }
+
+            return (oldPosition, newPosition);
+        }
         #endregion
     }
 }
