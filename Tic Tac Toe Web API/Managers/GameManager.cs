@@ -64,6 +64,13 @@ namespace Tic_Tac_Toe_Web_API.Managers
             {
                 throw new Exception("Game doesn't exist!");
             }
+
+            if (game.Players.Any(p => p.Id == 0))
+            {
+                await game.AddPawnAgainstComputerAsync(playerId, position);
+
+                return game;
+            }
             await game.AddPawnAsync(playerId, position);
 
             return game;
@@ -111,7 +118,12 @@ namespace Tic_Tac_Toe_Web_API.Managers
             {
                 throw new InvalidDataException($"Game with Id {gameId} doesn't exist!");
             }
+            if (game.Players.Any(p => p.Id == 0))
+            {
+                await game.MakeMoveAgainstComputerAsync(playerId, oldPosition, newPosition);
 
+                return game;
+            }
             await game.MakeMoveAsync(playerId, oldPosition, newPosition);
 
             return game;

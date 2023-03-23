@@ -37,7 +37,7 @@ namespace Tic_Tac_Toe_Web_API.Models
 
             if (Players.Any(p => p.Id == playerId) && (GameStatus == GameStatus.WaitingForOpponent
                 || GameStatus == GameStatus.Finished
-                || Players.Any(p => p.Id == Player.Computer.Id)))
+                || (Players.Any(p => p.Id == Player.Computer.Id && this.Grid.All(m => m == Mark.None)))))
             {
                 this.PlayerXIndex = mark == Mark.X ? 0 : 1;
                 this.PlayerOIndex = mark == Mark.X ? 1 : 0;
@@ -45,9 +45,7 @@ namespace Tic_Tac_Toe_Web_API.Models
 
                 if (mark == Mark.O)
                 {
-                    Random random= new Random();
-                    var position = random.Next(0, 9);
-                    await this.AddPawnAsync(Player.Computer.Id, position);
+                    await this.ComputerAddPawnAsync();
                     GameState++;
                 }
             }
@@ -69,33 +67,48 @@ namespace Tic_Tac_Toe_Web_API.Models
             }
             var currentPlayerId = this.Players[CurrentPlayerIndex].Id;
             if (currentPlayerId == player.Id && GameStatus == GameStatus.Started &&
-                PlayerXPawns > 0 && PlayerOPawns > 0)
+                (PlayerXPawns > 0 || PlayerOPawns > 0))
             {
                 var mark = await GetMarkByPlayerAsync(player.Id);
                 if (Grid[position] == Mark.None)
                 {
                     Grid[position] = mark;
-                    PlayerXPawns = (mark == Mark.X) ? PlayerXPawns-- : PlayerOPawns--;
-                    GameState++;
+                    if (mark == Mark.X)
+                    {
+                        PlayerXPawns--;
+                        GameState++;
+                    }
+                    else
+                    {
+                        PlayerOPawns--;
+                        GameState++;
+                    }
                 }
                 else
                 {
                     throw new Exception("Cell is already marked, please choose another cell!");
                 }
 
-                if (CurrentPlayerIndex == 0)
-                {
-                    CurrentPlayerIndex = 1;
-                }
-                else if (CurrentPlayerIndex == 1)
-                {
-                    CurrentPlayerIndex = 0;
-                }
+                CurrentPlayerIndex = (CurrentPlayerIndex == 0) ? 1 : 0;
             }
             else
             {
                 throw new Exception("It is not your turn to add a pawn or your pawns have finished!");
             }
+        }
+
+        public async Task AddPawnAgainstComputerAsync(int playerId, int position)
+        {
+            await AddPawnAsync(playerId, position);
+            await ComputerAddPawnAsync();
+        }
+
+        public async Task ComputerAddPawnAsync()
+        {
+            Random random = new Random();
+            var position = random.Next(0, 9);
+            CurrentPlayerIndex = 1;
+            await this.AddPawnAsync(Player.Computer.Id, position);
         }
 
         public override async Task MakeMoveAsync(int playerId, int oldPosition, int newPosition)
@@ -104,6 +117,10 @@ namespace Tic_Tac_Toe_Web_API.Models
             if (player == null)
             {
                 throw new UnauthorizedAccessException("Please join another game!");
+            }
+            if (PlayerXPawns > 0 || PlayerOPawns > 0) 
+            {
+                throw new Exception("First add all pawns!");
             }
             var currentPlayerId = this.Players[CurrentPlayerIndex].Id;
 
