@@ -39,6 +39,8 @@ namespace Tic_Tac_Toe_Web_API.Models
             {
                 this.PlayerXIndex = mark == Mark.X ? 0 : 1;
                 this.PlayerOIndex = mark == Mark.X ? 1 : 0;
+                this.CurrentPlayerIndex = mark == Mark.X ? 0 : 1;
+
                 GameState++;
 
                 if (mark == Mark.O)
@@ -93,7 +95,16 @@ namespace Tic_Tac_Toe_Web_API.Models
         public async Task AddPawnAgainstComputerAsync(int playerId, int position)
         {
             await AddPawnAsync(playerId, position);
-            await ComputerAddPawnAsync();
+
+            if (PlayerXPawns > 0 && PlayerOPawns > 0)
+            {
+                await ComputerAddPawnAsync();
+            }
+            else if (PlayerXPawns == 0 && PlayerOPawns == 0)
+            {
+                await ComputerMakeMoveAsync();
+            }
+
         }
 
         public async Task ComputerAddPawnAsync()
@@ -130,7 +141,7 @@ namespace Tic_Tac_Toe_Web_API.Models
                 var mark = await GetMarkByPlayerAsync(player.Id);
 
                 if (Grid[newPosition] == Mark.None &&
-                    (newPosition == GetOffsetPosition(oldPosition, - 1) || newPosition == GetOffsetPosition(oldPosition, 1) || oldPosition == 0 || newPosition == 0))
+                    (newPosition == GetOffsetPosition(oldPosition, -1) || newPosition == GetOffsetPosition(oldPosition, 1) || oldPosition == 0 || newPosition == 0))
                 {
                     Grid[newPosition] = mark;
                     Grid[oldPosition] = Mark.None;
@@ -143,10 +154,12 @@ namespace Tic_Tac_Toe_Web_API.Models
                         CounterTotalGames++;
                         GameState = 0;
                     }
+
+                    CurrentPlayerIndex = (CurrentPlayerIndex == 0) ? 1 : 0;
                 }
                 else
                 {
-                    if (player == Player.Computer)
+                    if (player == Player.Computer && CurrentPlayerIndex == Player.Computer.Id)
                     {
                         await ComputerMakeMoveAsync();
                         return;
@@ -154,7 +167,6 @@ namespace Tic_Tac_Toe_Web_API.Models
                     throw new Exception("Please choose another cell!");
                 }
 
-                CurrentPlayerIndex = (CurrentPlayerIndex == 0) ? 1 : 0;
             }
             else if (GameStatus == GameStatus.Finished)
             {
@@ -199,9 +211,9 @@ namespace Tic_Tac_Toe_Web_API.Models
 
         private bool CheckForLineOfThree(int position, Mark mark)
         {
-            var leftLine   = Grid[GetOffsetPosition(position, -2)] == mark && Grid[GetOffsetPosition(position, -1)] == mark;
-            var rightLine  = Grid[GetOffsetPosition(position,  2)] == mark && Grid[GetOffsetPosition(position,  1)] == mark;
-            var middleLine = Grid[GetOffsetPosition(position, -1)] == mark && Grid[GetOffsetPosition(position,  1)] == mark;
+            var leftLine = Grid[GetOffsetPosition(position, -2)] == mark && Grid[GetOffsetPosition(position, -1)] == mark;
+            var rightLine = Grid[GetOffsetPosition(position, 2)] == mark && Grid[GetOffsetPosition(position, 1)] == mark;
+            var middleLine = Grid[GetOffsetPosition(position, -1)] == mark && Grid[GetOffsetPosition(position, 1)] == mark;
 
             return leftLine || rightLine || middleLine;
         }
@@ -271,10 +283,6 @@ namespace Tic_Tac_Toe_Web_API.Models
                 }
             }
             while (possibleNewPositions.Count == 0);
-            {
-                positionInMarkedPositions = random.Next(0, markedPositions.Count);
-                oldPosition = markedPositions[positionInMarkedPositions];
-            }
 
             var positionInpossibleNewPositions = random.Next(0, possibleNewPositions.Count);
             int newPosition = possibleNewPositions[positionInpossibleNewPositions];

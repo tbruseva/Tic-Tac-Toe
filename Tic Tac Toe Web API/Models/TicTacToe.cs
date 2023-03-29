@@ -70,15 +70,6 @@ namespace Tic_Tac_Toe_Web_API.Models
 
         public abstract Task MakeMoveAsync(int playerId, int rowPosition, int colPosition);
 
-        public virtual async Task RestartGameAsync()
-        {
-            GameStatus = GameStatus.Started;
-            Grid = new Mark[9];
-            WinCells.Clear();
-            CurrentPlayerIndex = 0;
-            GameState++;
-        }
-
         public abstract Task SelectMarkAsync(int playerId, Mark mark);
 
         public abstract Task MakeMoveAgainstComputerAsync(int playerId, int rowPosition, int colPosition);
@@ -90,6 +81,14 @@ namespace Tic_Tac_Toe_Web_API.Models
             return GameState;
         }
 
+        public virtual async Task RestartGameAsync()
+        {
+            GameStatus = GameStatus.Started;
+            Grid = new Mark[9];
+            WinCells.Clear();
+            CurrentPlayerIndex = 0;
+            GameState++;
+        }
         protected virtual async Task<bool> CheckIfWinAsync(Mark mark)
         {
             foreach (var list in WinningCombinations)

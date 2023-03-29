@@ -41,11 +41,13 @@ namespace Tic_Tac_Toe_Web_API.Models
             {
                 this.PlayerXIndex = mark == Mark.X ? 0 : 1;
                 this.PlayerOIndex = mark == Mark.X ? 1 : 0;
+                this.CurrentPlayerIndex = mark == Mark.X ? 0 : 1;
                 GameState++;
 
-                if (mark == Mark.O)
+                if (mark == Mark.O && Players.Any(p => p.Id == Player.Computer.Id))
                 {
                     GameStatus = GameStatus.Started;
+                    CurrentPlayerIndex = 1;
                     await this.ComputerMakeMoveAsync();
                     GameState++;
                 }
