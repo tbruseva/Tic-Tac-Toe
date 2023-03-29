@@ -60,7 +60,6 @@ namespace Tic_Tac_Toe_Web_API.Models
                 this.Players.Add(Player.Computer);
                 CounterWins.Add(player.Id, 0);
                 CounterWins.Add(Player.Computer.Id, 0);
-
                 GameState++;
             }
             else

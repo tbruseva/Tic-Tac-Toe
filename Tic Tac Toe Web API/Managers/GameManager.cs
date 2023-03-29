@@ -35,7 +35,21 @@ namespace Tic_Tac_Toe_Web_API.Managers
 
         public async Task<IGame> CreateGameAsync(string name)
         {
-            IGame game = (name == "Tic-Tac-Toe") ? new TicTacToeGame() : new RotaGame();
+            IGame game = null;
+
+            if (name == "Tic-Tac-Toe")
+            {
+                game = new TicTacToeGame();
+            }
+            else if (name == "Rota")
+            {
+                game = new RotaGame();
+            }
+            else
+            {
+                throw new Exception("Game isn't supported!");
+            }
+
             _allGames.Add(game);
 
             return game;
