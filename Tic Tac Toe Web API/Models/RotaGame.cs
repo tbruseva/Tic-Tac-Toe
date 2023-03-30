@@ -49,10 +49,6 @@ namespace Tic_Tac_Toe_Web_API.Models
                     GameState++;
                 }
             }
-            else if (Players[1].Id == playerId)
-            {
-                throw new UnauthorizedAccessException("Only first player entered the game can select a mark!");
-            }
             else
             {
                 throw new AccessViolationException("You cannot select a mark after the game has started!");
@@ -96,7 +92,7 @@ namespace Tic_Tac_Toe_Web_API.Models
         {
             await AddPawnAsync(playerId, position);
 
-            if (PlayerXPawns > 0 && PlayerOPawns > 0)
+            if (PlayerOPawns > 0)
             {
                 await ComputerAddPawnAsync();
             }
@@ -159,11 +155,11 @@ namespace Tic_Tac_Toe_Web_API.Models
                 }
                 else
                 {
-                    if (player == Player.Computer && CurrentPlayerIndex == Player.Computer.Id)
-                    {
-                        await ComputerMakeMoveAsync();
-                        return;
-                    }
+                    //    if (player == Player.Computer && CurrentPlayerIndex == Player.Computer.Id)
+                    //    {
+                    //        await ComputerMakeMoveAsync();
+                    //        return;
+                    //    }
                     throw new Exception("Please choose another cell!");
                 }
 
@@ -181,7 +177,11 @@ namespace Tic_Tac_Toe_Web_API.Models
         public override async Task MakeMoveAgainstComputerAsync(int playerId, int oldPosition, int newPosition)
         {
             await MakeMoveAsync(playerId, oldPosition, newPosition);
+
+            if (GameStatus != GameStatus.Finished)
+            {
             await ComputerMakeMoveAsync();
+            }
         }
 
         public override async Task ComputerMakeMoveAsync()

@@ -52,10 +52,6 @@ namespace Tic_Tac_Toe_Web_API.Models
                     GameState++;
                 }
             }
-            else if (Players[1].Id == playerId)
-            {
-                throw new UnauthorizedAccessException("Only first player entered the game can select a mark!");
-            }
             else
             {
                 throw new AccessViolationException("You cannot select a mark after the game has started!");
