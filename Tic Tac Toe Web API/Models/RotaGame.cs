@@ -155,11 +155,6 @@ namespace Tic_Tac_Toe_Web_API.Models
                 }
                 else
                 {
-                    //    if (player == Player.Computer && CurrentPlayerIndex == Player.Computer.Id)
-                    //    {
-                    //        await ComputerMakeMoveAsync();
-                    //        return;
-                    //    }
                     throw new Exception("Please choose another cell!");
                 }
 
