@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System;
+using System.Data;
 using Tic_Tac_Toe_Web_API.Managers.Interfaces;
 using Tic_Tac_Toe_Web_API.Models;
 using Tic_Tac_Toe_Web_API.Models.Interfaces;
@@ -11,15 +10,15 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class TicTacToeController : ControllerBase
+    public class RotaController : Controller
     {
         private IGameManager _gameManager;
-        private TicTacToeGameMapper _gameMapper;
+        private RomanTicTacToeGameMapper _mapper;
 
-        public TicTacToeController(IGameManager gameManager, TicTacToeGameMapper gameMapper)
+        public RotaController(IGameManager gameManager, RomanTicTacToeGameMapper mapper)
         {
             _gameManager = gameManager;
-            _gameMapper = gameMapper;
+            _mapper = mapper;
         }
 
         [Route("{gameId}")]
@@ -28,13 +27,30 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = await _gameManager.GetGameByIdAsync(gameId) as TicTacToeGame;
-
+                var game = await _gameManager.GetGameByIdAsync(gameId) as RotaGame;
                 if (game == null)
                 {
-                    throw new Exception("Game is not from type TicTacToe");
+                    throw new Exception("Game is not from type Rota");
                 }
-                var responseDto = _gameMapper.ConvertToResponseDto(game);
+
+                var responseDto = _mapper.ConvertToResponseDto(game);
+
+                return StatusCode(200, responseDto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Route("AddPawn")]
+        [HttpPost]
+        public async Task<IActionResult> AddPawn([FromHeader] int gameId,[FromHeader] int playerId, [FromHeader] int position)
+        {
+            try
+            {
+                var game = await _gameManager.AddPawnAsync(gameId, playerId, position);
+                var responseDto = _mapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, responseDto);
             }
@@ -46,12 +62,12 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         [Route("MakeMove")]
         [HttpPost]
-        public async Task<IActionResult> MakeMove([FromHeader] int playerId, [FromHeader] int gameId, [FromHeader] int rowPosition, [FromHeader] int colPosition)
+        public async Task<IActionResult> MakeMove([FromHeader] int playerId, [FromHeader] int gameId, [FromHeader] int oldPosition, int newPosition)
         {
             try
             {
-                var game = await _gameManager.TicTacToeMakeMoveAsync(gameId, playerId, rowPosition, colPosition);
-                var responseDto = _gameMapper.ConvertToResponseDto(game);
+                var game = await _gameManager.RotaMakeMoveAsync(gameId, playerId, oldPosition, newPosition);
+                var responseDto = _mapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, responseDto);
             }
@@ -62,19 +78,19 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         }
 
-        
+
         [Route("SelectMark/{gameId}")]
         [HttpPost]
         public async Task<IActionResult> SelectMark([FromRoute] int gameId, [FromHeader] int playerId, [FromBody] string mark)
         {
             try
             {
-                var game = await _gameManager.SelectMarkAsync(gameId, playerId, mark) as TicTacToeGame;
+                var game = await _gameManager.SelectMarkAsync(gameId, playerId, mark) as RotaGame;
                 if (game == null)
                 {
                     throw new Exception("Game doesn't exist!");
                 }
-                var responseDto = _gameMapper.ConvertToResponseDto(game);
+                var responseDto = _mapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, responseDto);
             }
@@ -90,12 +106,12 @@ namespace Tic_Tac_Toe_Web_API.Controllers
         {
             try
             {
-                var game = await _gameManager.RestartGameAsync(gameId, playerId) as TicTacToeGame;
+                var game = await _gameManager.RestartGameAsync(gameId, playerId) as RotaGame;
                 if (game == null)
                 {
                     throw new Exception("Game doesn't exist!");
                 }
-                var responseDto = _gameMapper.ConvertToResponseDto(game);
+                var responseDto = _mapper.ConvertToResponseDto(game);
                 return StatusCode(200, responseDto);
             }
             catch (Exception ex)
@@ -114,8 +130,8 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
                 return StatusCode(200, state);
             }
-            catch (Exception ex) 
-            { 
+            catch (Exception ex)
+            {
                 return BadRequest(ex.Message);
             }
         }

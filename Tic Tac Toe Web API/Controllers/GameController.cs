@@ -45,11 +45,11 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         [Route("")]
         [HttpPost]
-        public async Task<IActionResult> CreateGame()
+        public async Task<IActionResult> CreateGame([FromHeader] string name)
         {
             try
             {
-                var game = await _gameManager.CreateGameAsync();
+                var game = await _gameManager.CreateGameAsync(name);
                 var responseDto = _allGamesMapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, responseDto);
@@ -79,12 +79,12 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         [Route("JoinGame/{gameId}")]
         [HttpPost]
-        public async Task <IActionResult> JoinGame([FromRoute] int gameId, [FromHeader] int playerId, [FromHeader] bool auto = false)
+        public async Task <IActionResult> JoinGame([FromRoute] int gameId, [FromHeader] int playerId, [FromHeader] bool autoPlay = false)
         {
             try
             {
                 var player = await _playerManager.GetPlayerAsync(playerId);
-                var game = (auto == false) ? await _gameManager.JoinGameAsync(gameId, player) : await _gameManager.JoinGameAgainstComputerAsync(gameId, player);
+                var game = (autoPlay == false) ? await _gameManager.JoinGameAsync(gameId, player) : await _gameManager.JoinGameAgainstComputerAsync(gameId, player);
                 var responseDto = _allGamesMapper.ConvertToResponseDto(game);
 
                 return StatusCode(200, responseDto);
