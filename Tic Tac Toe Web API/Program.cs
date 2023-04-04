@@ -33,8 +33,6 @@ namespace Tic_Tac_Toe_Web_API
             builder.Services.AddScoped<TicTacToeGameMapper>();
             builder.Services.AddScoped<PlayerMapper>();
             builder.Services.AddScoped<RomanTicTacToeGameMapper>();
-            //builder.Services.AddServerSentEvents();
-            //builder.Services.AddHostedService<ServerEventsWorker>();
 
             var app = builder.Build();
 
@@ -52,7 +50,6 @@ namespace Tic_Tac_Toe_Web_API
 
 
             app.MapControllers();
-            app.MapServerSentEvents("/rn-updates");
             app.Run();
         }
     }

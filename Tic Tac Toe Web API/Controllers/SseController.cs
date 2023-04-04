@@ -18,8 +18,9 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         }
         
+        [Route("{gameId}")]
         [HttpGet]
-        public async Task<IActionResult> GetEvents(int gameId)
+        public async Task<IActionResult> GetEvents([FromRoute] int gameId)
         {
             var game = await _gameManager.GetGameByIdAsync(gameId);
             var gameState = 0;
