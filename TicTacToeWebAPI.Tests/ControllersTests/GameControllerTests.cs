@@ -38,12 +38,12 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         {
             //Arrange
             var listAllGames = new List<IGame>();
+            var responseDto = listAllGames.Select(g => _gamesMapper.ConvertToResponseDto(g));
 
             _gameManager.Setup(g => g.GetAllGamesAsync()).ReturnsAsync(listAllGames);
 
             //Act
             var result = await _controller.AllGames();
-            var responseDto = listAllGames.Select(g => _gamesMapper.ConvertToResponseDto(g));
 
             //Assert
             Assert.IsNotNull(result);
@@ -67,10 +67,10 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
 
             //Assert
             Assert.IsNotNull(responseDto);
-            Assert.IsInstanceOf<ObjectResult>(responseDto);
+            Assert.IsInstanceOf<IEnumerable<AllGamesResponseDto>>(responseDto);
 
-            var okResult = responseDto as ObjectResult;
-            Assert.AreEqual(responseDto, okResult.Value);
+            var okResult = result as ObjectResult;
+            Assert.That(okResult.Value, Is.EqualTo(responseDto));
         }
 
         [Test]
@@ -104,7 +104,7 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             //Assert
             Assert.IsInstanceOf<AllGamesResponseDto>(responseDto);
             var okResult = result as ObjectResult;
-            //Assert.That(okResult.Value, Is.EqualTo(game));
+            Assert.That(okResult.Value, Is.EqualTo(responseDto));
         }
 
         [Test]
@@ -113,6 +113,7 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             //Arrange
             string username = "to";
             var player = _fixture.Build<Player>().With(p => p.Name, username).Create();
+
             _playerManager.Setup(g => g.CreatePlayerAsync(username)).ReturnsAsync(player);
             var responseDto = _playerMapper.ConvertToResponseDto(player);
 
@@ -120,93 +121,91 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             var result = await _controller.CreatePlayer(username);
 
             //Assert
-            Assert.IsNotNull(responseDto);
-            Assert.IsInstanceOf<ObjectResult>(responseDto);
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
 
             var okResult = result as ObjectResult;
-            bool isEqual = responseDto == okResult.Value;
-            //Assert.That(okResult.Value, Is.EqualTo(responseDto));
-            Assert.That(IsByValue.ReferenceEquals(okResult, responseDto));
+            Assert.That(okResult.Value, Is.EqualTo(responseDto));
         }
 
-        //[Test]
-        //public void CreatePlayer_Should_Catch_Exception_If_PlayerManager_Throws_Exception()
-        //{
-        //    //Arrange
-        //    string username = "to";
-        //    _playerManager.Setup(g => g.CreatePlayer(username)).Throws<InvalidOperationException>();
+        [Test]
+        public async Task CreatePlayer_Should_Catch_Exception_If_PlayerManager_Throws_Exception()
+        {
+            //Arrange
+            string username = "to";
+            _playerManager.Setup(g => g.CreatePlayerAsync(username)).Throws<InvalidOperationException>();
 
-        //    //Act
-        //    var result = _controller.CreatePlayer(username);
+            //Act
+            var result = await _controller.CreatePlayer(username);
 
-        //    //Assert
-        //    Assert.IsNotNull(result);
-        //    Assert.IsInstanceOf<ObjectResult>(result);
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
 
-        //    var okResult = result as ObjectResult;
-        //    Assert.IsInstanceOf<BadRequestObjectResult>(result);
-        //}
+            var okResult = result as ObjectResult;
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+        }
 
-        //[Test]
-        //public void JoinGame_Should_Return_ResponseDto()
-        //{
-        //    //Arrange
-        //    Player player = _fixture.Create<Player>();
-        //    var game = _fixture.Create<TicTacToeGame>();
-        //    _playerManager.Setup(g => g.GetPlayer(player.Id)).Returns(player);
-        //    _gameManager.Setup(g => g.JoinGame(game.Id, player)).Returns(game);
-        //    var responseDto = _gamesMapper.ConvertToResponseDto(game);
+        [Test]
+        public async Task JoinGame_Should_Return_ResponseDto()
+        {
+            //Arrange
+            Player player = _fixture.Create<Player>();
+            var game = _fixture.Create<TicTacToeGame>();
+            _playerManager.Setup(g => g.GetPlayerAsync(player.Id)).ReturnsAsync(player);
+            _gameManager.Setup(g => g.JoinGameAsync(game.Id, player)).ReturnsAsync(game);
+            var responseDto = _gamesMapper.ConvertToResponseDto(game);
 
-        //    //Act
-        //    var result = _controller.JoinGame(game.Id, player.Id);
+            //Act
+            var result = await _controller.JoinGame(game.Id, player.Id);
 
-        //    //Assert
-        //    Assert.IsNotNull(result);
-        //    Assert.IsInstanceOf<ObjectResult>(result);
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
 
-        //    var okResult = result as ObjectResult;
-        //    Assert.That(okResult.Value, Is.EqualTo(responseDto));
-        //}
+            var okResult = result as ObjectResult;
+            Assert.That(okResult.Value, Is.EqualTo(responseDto));
+        }
 
-        //[Test]
-        //public void JoinGame_Should_Catch_Exception_When_PlayerManager_Throws_Exception()
-        //{
-        //    //Arrange
-        //    int gameId = 1;
-        //    int playerId = 3;
+        [Test]
+        public async Task JoinGame_Should_Catch_Exception_When_PlayerManager_Throws_Exception()
+        {
+            //Arrange
+            int gameId = 1;
+            int playerId = 3;
 
-        //    _playerManager.Setup(g => g.GetPlayer(playerId)).Throws<Exception>();
+            _playerManager.Setup(g => g.GetPlayerAsync(playerId)).Throws<Exception>();
 
-        //    //Act
-        //    var result = _controller.JoinGame(gameId, playerId);
+            //Act
+            var result = await _controller.JoinGame(gameId, playerId);
 
-        //    //Assert
-        //    Assert.IsNotNull(result);
-        //    Assert.IsInstanceOf<ObjectResult>(result);
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
 
-        //    var okResult = result as ObjectResult;
-        //    Assert.IsInstanceOf<BadRequestObjectResult>(result);
-        //}
+            var okResult = result as ObjectResult;
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+        }
 
-        //[Test]
-        //public void JoinGame_Should_Catch_Exception_When_GameManager_Throws_Exception()
-        //{
-        //    //Arrange
-        //    int gameId = 1;
-        //    Player player = _fixture.Create<Player>();
+        [Test]
+        public async Task JoinGame_Should_Catch_Exception_When_GameManager_Throws_Exception()
+        {
+            //Arrange
+            int gameId = 1;
+            Player player = _fixture.Create<Player>();
 
-        //    _playerManager.Setup(g => g.GetPlayer(player.Id)).Returns(player);
-        //    _gameManager.Setup(g => g.JoinGame(gameId, player)).Throws<Exception>();
+            _playerManager.Setup(g => g.GetPlayerAsync(player.Id)).ReturnsAsync(player);
+            _gameManager.Setup(g => g.JoinGameAsync(gameId, player)).Throws<Exception>();
 
-        //    //Act
-        //    var result = _controller.JoinGame(gameId, player.Id);
+            //Act
+            var result = await _controller.JoinGame(gameId, player.Id);
 
-        //    //Assert
-        //    Assert.IsNotNull(result);
-        //    Assert.IsInstanceOf<ObjectResult>(result);
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
 
-        //    var okResult = result as ObjectResult;
-        //    Assert.IsInstanceOf<BadRequestObjectResult>(result);
-        //}
+            var okResult = result as ObjectResult;
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+        }
     }
 }

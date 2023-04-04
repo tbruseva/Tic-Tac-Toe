@@ -17,6 +17,7 @@
 
 //namespace TicTacToeWebAPI.Tests.ManagerTests
 //{
+
 //    [TestFixture]
 //    public class GameManagerTests
 //    {
@@ -41,10 +42,10 @@
 
 //            var responseDto = listOfGames.Select(g => _gameMapper.ConvertToResponseDto(g));
 
-//            //Act
+//            Act
 //            var result = _gameManager.GetAllGames();
 
-//            //Assert
+//            Assert
 //            Assert.That(result, Is.Not.Null);
 //            Assert.That(result, Is.EqualTo(responseDto));
 //        }
@@ -52,13 +53,13 @@
 //        [Test]
 //        public void GetGameById_Should_Return_Game_If_Game_Exist()
 //        {
-//            //Arrange
+//            Arrange
 //            var game = _gameManager.CreateGame();
 
-//            //Act
+//            Act
 //            var result = _gameManager.GetGameById(1);
 
-//            //Assert
+//            Assert
 //            Assert.IsNotNull(result);
 //            Assert.That(result.GameId, Is.EqualTo(game.GameId));
 //        }
@@ -75,7 +76,7 @@
 //        [Test]
 //        public void CreateGame_Should_Return_Created_Game()
 //        {
-            
+
 //        }
 
 //        [Test]
@@ -84,7 +85,7 @@
 //            var game = _gameManager.CreateGame();
 //            var player = _fixture.Create<Player>();
 
-//           var result = _gameManager.JoinGame(game.GameId, player);
+//            var result = _gameManager.JoinGame(game.GameId, player);
 
 //            Assert.That(result.Players[0].Id, Is.EqualTo(player.Id));
 //            Assert.That(result.Players.Count, Is.EqualTo(1));
@@ -124,7 +125,7 @@
 //        public void TicTacToeSelectMark_Should_Update_First_Player_Mark()
 //        {
 //            var player1 = new Player { Name = "to" };
-//            //var player2 = new Player { Name = "no" };
+//            var player2 = new Player { Name = "no" };
 //            var player2 = new Player { Name = "po" };
 //            string newMark = "O";
 //            var game = _gameManager.CreateGame();
@@ -142,8 +143,8 @@
 //        [Test]
 //        public void TicTacToeSelectMark_Should_Throw_Exception_If_Player_Doesnt_Exist_In_Game_List_Of_Players()
 //        {
-//            var player1 = _fixture.Build<Player>().With(p=>p.Name, "to").Create();
-//            var player2 = _fixture.Build<Player>().With(p=>p.Name, "no").Create();
+//            var player1 = _fixture.Build<Player>().With(p => p.Name, "to").Create();
+//            var player2 = _fixture.Build<Player>().With(p => p.Name, "no").Create();
 //            int player3Id = 3;
 //            string mark = "O";
 
@@ -191,12 +192,12 @@
 //        {
 //            var player1 = _fixture.Build<Player>().With(p => p.Name, "to").Create();
 //            var player2 = _fixture.Build<Player>().With(p => p.Name, "no").Create();
-//            //Doesnt work
-//            //var game = _fixture.Build<TicTacToeGame>().With(g => g.Players[0], player1).With(g => g.Players[1], player2).Create();
+//            Doesnt work
+//            var game = _fixture.Build<TicTacToeGame>().With(g => g.Players[0], player1).With(g => g.Players[1], player2).Create();
 //            var game = _gameManager.CreateGame();
 //            game.Players.Add(player1);
 //            game.Players.Add(player2);
-//                        var restartedGame = _gameManager.TicTacToeRestartGame(game.GameId, player1.Id);
+//            var restartedGame = _gameManager.TicTacToeRestartGame(game.GameId, player1.Id);
 
 //            Assert.That(restartedGame.Grid, Is.Not.Unique);
 //            Assert.That(restartedGame.Grid[0], Is.EqualTo(Mark.None));
@@ -216,17 +217,17 @@
 //            Assert.That(restartedGame.Grid, Is.Not.Unique);
 //            Assert.That(restartedGame.Grid[0], Is.EqualTo(restartedGame.Grid[1]).And.EqualTo(restartedGame.Grid[2]).And.EqualTo(restartedGame.Grid[3]).And.EqualTo(restartedGame.Grid[4]).And.EqualTo(restartedGame.Grid[5]).And.EqualTo(restartedGame.Grid[6]).And.EqualTo(restartedGame.Grid[7]).And.EqualTo(restartedGame.Grid[8]));
 //        }
-//        //[Test]
-//        //public void RestartGame_Should_Throw_Exception_If_Unauthorized_Player_Tries_To_Restart()
-//        //{
-//        //    int gameId = 1;
-//        //    string username = "po";
-//        //    var player1 = new Player { Name = "to" };
-//        //    var player2 = new Player { Name = "no" };
-//        //    var game = new TicTacToeGame { Id = 1, Name = "Tic-Tac-Toe", CurrentPlayerId = Tic_Tac_Toe_Web_API.Enums.Mark.X, GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Grid = new Tic_Tac_Toe_Web_API.Enums.Mark[9], Players = new List<Player> { player1, player2 } };
+//        [Test]
+//        public void RestartGame_Should_Throw_Exception_If_Unauthorized_Player_Tries_To_Restart()
+//        {
+//            int gameId = 1;
+//            string username = "po";
+//            var player1 = new Player { Name = "to" };
+//            var player2 = new Player { Name = "no" };
+//            var game = new TicTacToeGame { Id = 1, Name = "Tic-Tac-Toe", CurrentPlayerId = Tic_Tac_Toe_Web_API.Enums.Mark.X, GameStatus = Tic_Tac_Toe_Web_API.Enums.GameStatus.NotStarted, Grid = new Tic_Tac_Toe_Web_API.Enums.Mark[9], Players = new List<Player> { player1, player2 } };
 
-//        //    Assert.That(()=>_gameManager.RestartGame(gameId, username),Throws.TypeOf<UnauthorizedAccessException>());
-//        //}
+//            Assert.That(() => _gameManager.RestartGame(gameId, username), Throws.TypeOf<UnauthorizedAccessException>());
+//        }
 
 //        private List<IGame> GetListOfAllGames(IGameManager gameManager)
 //        {
