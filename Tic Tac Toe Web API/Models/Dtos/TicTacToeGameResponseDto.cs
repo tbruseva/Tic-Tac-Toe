@@ -14,5 +14,28 @@ namespace Tic_Tac_Toe_Web_API.Models.Dtos
         public int GameState { get; set; }
         public Dictionary<int, int> CounterWins { get; set; }
         public int CounterTotalGamesPlayed { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            var item = obj as RotaResponseDto;
+
+            if (item == null)
+            {
+                return false;
+            }
+
+            return this.Id == item.Id
+                && this.Grid == item.Grid
+                && this.PlayerX == item.PlayerX
+                && this.PlayerO == item.PlayerO;
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = Id.GetHashCode();
+            hash = hash + (PlayerX != null ? PlayerX.GetHashCode() : 0) + (PlayerO != null ? PlayerO.GetHashCode() : 0);
+
+            return hash;
+        }
     }
 }
