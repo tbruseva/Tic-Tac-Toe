@@ -17,7 +17,7 @@ namespace Tic_Tac_Toe_Web_API.Models.Dtos
 
         public override bool Equals(object obj)
         {
-            var item = obj as RotaResponseDto;
+            var item = obj as TicTacToeGameResponseDto;
 
             if (item == null)
             {
