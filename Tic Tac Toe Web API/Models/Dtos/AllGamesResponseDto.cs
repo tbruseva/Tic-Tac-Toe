@@ -12,7 +12,7 @@ namespace Tic_Tac_Toe_Web_API.Models.Dtos
         public GameStatus Status { get; set; }
         public List<Player> Players { get; set; } = new List<Player>();
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             var item = obj as AllGamesResponseDto;
 

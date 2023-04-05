@@ -2,7 +2,7 @@
 
 namespace Tic_Tac_Toe_Web_API.Models.Mappers
 {
-    public class RomanTicTacToeGameMapper
+    public class RotaGameMapper
     {
         public RotaResponseDto ConvertToResponseDto(RotaGame game)
         {

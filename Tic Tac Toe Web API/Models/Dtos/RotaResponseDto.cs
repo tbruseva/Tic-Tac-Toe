@@ -25,16 +25,12 @@ namespace Tic_Tac_Toe_Web_API.Models.Dtos
                 return false;
             }
 
-            return this.Id == item.Id 
-                && this.Grid == item.Grid
-                && this.PlayerX == item.PlayerX
-                && this.PlayerO == item.PlayerO;
+            return this.Id == item.Id;
         }
 
         public override int GetHashCode()
         {
             int hash = Id.GetHashCode();
-            hash = hash + (PlayerX != null ? PlayerX.GetHashCode() : 0) + (PlayerO != null ? PlayerO.GetHashCode() : 0);
 
             return hash;
         }

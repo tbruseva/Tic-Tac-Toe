@@ -1,15 +1,7 @@
 ﻿using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tic_Tac_Toe_Web_API.Controllers;
 using Tic_Tac_Toe_Web_API.Models;
 using Microsoft.AspNetCore.Mvc;
-using Tic_Tac_Toe_Web_API.Enums;
-using Tic_Tac_Toe_Web_API.Models.Dtos;
-using Tic_Tac_Toe_Web_API.Models.Interfaces;
 using NUnit.Framework.Internal;
 using AutoFixture;
 using Tic_Tac_Toe_Web_API.Managers.Interfaces;
@@ -41,17 +33,9 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
         public async Task GetGameById_Should_Return_ResponseDto_With_Correct_Details()
         {
             //Arrange
-            var playerX = new Player { Name = "to" };
-            var playerO = new Player { Name = "no" };
-            var game = new TicTacToeGame();
-            game.Players.Add(playerX);
-            game.Players.Add(playerO);
-            //var game = _fixture.Build<TicTacToeGame>().With(g => g.Players[0], playerX).With(g => g.Players[1], playerO).Create();
-            var responseDto =  _gameMapper.ConvertToResponseDto(game);
-
-
+            var game = _fixture.Create<TicTacToeGame>();
             _gameManager.Setup(g => g.GetGameByIdAsync(game.Id)).ReturnsAsync(game);
-
+            var responseDto = _gameMapper.ConvertToResponseDto(game);
             //Act
             var result = await _controller.GetGameById(game.Id);
 
@@ -60,9 +44,26 @@ namespace TicTacToeWebAPI.Tests.ControllersTests
             Assert.IsInstanceOf<ObjectResult>(result);
 
             var okResult = result as ObjectResult;
-            Assert.That(okResult.Value, Is.EqualTo(responseDto));
+            Assert.That(okResult.Value.Equals(responseDto));
         }
 
+        [Test]
+        public async Task GetGameById_Should_Return_StatusCode_200_If_Game_Exist()
+        {
+            //Arrange
+            var game = _fixture.Create<TicTacToeGame>();
+            _gameManager.Setup(g => g.GetGameByIdAsync(game.Id)).ReturnsAsync(game);
+            var responseDto = _gameMapper.ConvertToResponseDto(game);
+            //Act
+            var result = await _controller.GetGameById(game.Id);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf<ObjectResult>(result);
+
+            var okResult = result as ObjectResult;
+            Assert.That(okResult.StatusCode, Is.EqualTo(200));
+        }
 
         [Test]
         public async Task GetGameById_Should_Catch_Exception_If_GameManager_Throws_Exception()
