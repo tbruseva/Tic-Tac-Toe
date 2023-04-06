@@ -13,9 +13,9 @@ namespace Tic_Tac_Toe_Web_API.Controllers
     public class RotaController : Controller
     {
         private IGameManager _gameManager;
-        private RomanTicTacToeGameMapper _mapper;
+        private RotaGameMapper _mapper;
 
-        public RotaController(IGameManager gameManager, RomanTicTacToeGameMapper mapper)
+        public RotaController(IGameManager gameManager, RotaGameMapper mapper)
         {
             _gameManager = gameManager;
             _mapper = mapper;

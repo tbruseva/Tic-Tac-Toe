@@ -29,7 +29,7 @@ namespace Tic_Tac_Toe_Web_API.Controllers
 
         [Route("Games")]
         [HttpGet]
-        public async Task<IActionResult> allGames()
+        public async Task<IActionResult> AllGames()
         {
             try
             {

@@ -1,4 +1,5 @@
-﻿using Tic_Tac_Toe_Web_API.Enums;
+﻿using System.Xml.Linq;
+using Tic_Tac_Toe_Web_API.Enums;
 
 namespace Tic_Tac_Toe_Web_API.Models.Dtos
 {
@@ -14,5 +15,24 @@ namespace Tic_Tac_Toe_Web_API.Models.Dtos
         public int GameState { get; set; }
         public Dictionary<int, int> CounterWins { get; set; }
         public int CounterTotalGamesPlayed { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            var item = obj as RotaResponseDto;
+
+            if (item == null)
+            {
+                return false;
+            }
+
+            return this.Id == item.Id;
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = Id.GetHashCode();
+
+            return hash;
+        }
     }
 }

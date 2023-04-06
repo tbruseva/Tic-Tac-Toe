@@ -1,3 +1,4 @@
+using Lib.AspNetCore.ServerSentEvents;
 using Tic_Tac_Toe_Web_API.Managers;
 using Tic_Tac_Toe_Web_API.Managers.Interfaces;
 using Tic_Tac_Toe_Web_API.Models.Mappers;
@@ -26,12 +27,12 @@ namespace Tic_Tac_Toe_Web_API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddSingleton<IGameManager, GameManager>();    
+            builder.Services.AddSingleton<IGameManager, GameManager>();
             builder.Services.AddSingleton<IPlayerManager, PlayerManager>();
             builder.Services.AddScoped<AllGamesMapper>();
             builder.Services.AddScoped<TicTacToeGameMapper>();
             builder.Services.AddScoped<PlayerMapper>();
-            builder.Services.AddScoped<RomanTicTacToeGameMapper>();
+            builder.Services.AddScoped<RotaGameMapper>();
 
             var app = builder.Build();
 
@@ -48,14 +49,7 @@ namespace Tic_Tac_Toe_Web_API
             app.UseAuthorization();
 
 
-           app.MapControllers();
-            //app.UseRouting();
-            //app.UseEndpoints(endpoints =>
-            //{
-            //    endpoints.MapControllerRoute(
-            //        name: "default",
-            //        pattern: "{controller}/{action}/{id?}");
-            //});
+            app.MapControllers();
             app.Run();
         }
     }

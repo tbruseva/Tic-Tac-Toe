@@ -14,5 +14,24 @@ namespace Tic_Tac_Toe_Web_API.Models.Dtos
         public int GameState { get; set; }
         public Dictionary<int, int> CounterWins { get; set; }
         public int CounterTotalGamesPlayed { get; set; }
+
+        public override bool Equals(object? obj)
+        {
+            var item = obj as TicTacToeGameResponseDto;
+
+            if (item == null)
+            {
+                return false;
+            }
+
+            return this.Id == item.Id;
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = Id.GetHashCode();
+
+            return hash;
+        }
     }
 }

@@ -1,9 +1,5 @@
-﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Newtonsoft.Json;
-using System;
-using System.Numerics;
+﻿
 using Tic_Tac_Toe_Web_API.Enums;
-using Tic_Tac_Toe_Web_API.Models.Interfaces;
 namespace Tic_Tac_Toe_Web_API.Models
 {
     public class TicTacToeGame : TicTacToe

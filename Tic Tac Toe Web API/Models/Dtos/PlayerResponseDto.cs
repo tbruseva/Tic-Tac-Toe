@@ -5,9 +5,9 @@ namespace Tic_Tac_Toe_Web_API.Models.Dtos
     public class PlayerResponseDto
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             var item = obj as PlayerResponseDto;
 

@@ -19,7 +19,9 @@ namespace Tic_Tac_Toe_Web_API.Managers
 
         public async Task<List<IGame>> GetAllGamesAsync()
         {
-            return _allGames.ToList();
+            var taskGames = Task.Run(() => _allGames.ToList());
+            var games = await taskGames;
+            return games;
         }
 
         public async Task<IGame> GetGameByIdAsync(int id)
