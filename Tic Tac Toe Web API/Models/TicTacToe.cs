@@ -1,5 +1,6 @@
 ﻿using Tic_Tac_Toe_Web_API.Enums;
 using Tic_Tac_Toe_Web_API.Models.Interfaces;
+using Tic_Tac_Toe_Web_API.Respository;
 
 namespace Tic_Tac_Toe_Web_API.Models
 {

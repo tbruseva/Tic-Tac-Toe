@@ -13,18 +13,13 @@ namespace Tic_Tac_Toe_Web_API.Respository
             _dbContext = dbContext;
         }
 
-        //public async Task Create(Player player, IGame game)
-        ////{
-        ////    if (game.Name == "Tic-Tac-Toe")
-        ////    {
-        ////       game = game as TicTacToeGame;
-        ////    }
-        ////    else if (game.Name == "Rota")
-        ////    {
-        ////        game = game as RotaGame;
-        ////    }
-        ////    var playerDb = new PlayerDbModel() { Id = player.Id,Name = player.Name, Game = game.Name, Wins = (game.CounterWins.Where};
-            
-        //}
+        public async Task<PlayerDbModel> CreatePlearAsync(Player player)
+        {
+            var playerDb = new PlayerDbModel() { Id = player.Id, Name = player.Name };
+            var createdDbPlayer = await _dbContext.AddAsync(playerDb);
+            await _dbContext.SaveChangesAsync();
+
+            return createdDbPlayer.Entity;
+        }
     }
 }

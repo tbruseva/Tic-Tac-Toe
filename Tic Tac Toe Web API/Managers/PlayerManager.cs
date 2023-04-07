@@ -2,16 +2,18 @@
 using Tic_Tac_Toe_Web_API.Models;
 using Tic_Tac_Toe_Web_API.Models.Dtos;
 using Tic_Tac_Toe_Web_API.Models.Mappers;
+using Tic_Tac_Toe_Web_API.Respository;
 
 namespace Tic_Tac_Toe_Web_API.Managers
 {
     public class PlayerManager : IPlayerManager
     {
         private List<Player> players = new List<Player>();
-        
+        private PlayersRepository _playersRepository;
 
-        public PlayerManager()
+        public PlayerManager(PlayersRepository playersRepository)
         {
+            _playersRepository = playersRepository;
             players.Add(Player.Computer);
         }
 
@@ -65,7 +67,7 @@ namespace Tic_Tac_Toe_Web_API.Managers
 
             var player = new Player();
             player.Name = username;
-            players.Add(player);
+            await _playersRepository.CreatePlearAsync(player);
 
             return player;
         }

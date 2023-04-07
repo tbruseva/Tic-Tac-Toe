@@ -10,7 +10,7 @@ namespace Tic_Tac_Toe_Web_API
     public class AppDbContext : DbContext
     {
         public DbSet<PlayerDbModel> Players { get; set; }
-        public DbSet<ResultsDbModel> Results { get; set; }
+        public DbSet<ResultDbModel> Results { get; set; }
         public string DbPath { get; }
 
         public AppDbContext()
