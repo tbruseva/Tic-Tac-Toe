@@ -10,6 +10,7 @@ namespace Tic_Tac_Toe_Web_API
     public class AppDbContext : DbContext
     {
         public DbSet<PlayerDbModel> Players { get; set; }
+        public DbSet<ResultsDbModel> Results { get; set; }
         public string DbPath { get; }
 
         public AppDbContext()
@@ -23,6 +24,7 @@ namespace Tic_Tac_Toe_Web_API
         // special "local" folder for your platform.
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseSqlite($"Data Source={DbPath}");
+
     }
 }
 
