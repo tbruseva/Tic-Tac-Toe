@@ -1,11 +1,12 @@
 ﻿using Tic_Tac_Toe_Web_API.Enums;
 using Tic_Tac_Toe_Web_API.Respository;
+using Tic_Tac_Toe_Web_API.Respository.Interfaces;
 
 namespace Tic_Tac_Toe_Web_API.Models
 {
     public class RotaGame : TicTacToe
     {
-        public ResultsRepository _resultsRepository;
+        public IResultsRepository _resultsRepository;
         public int PlayerXPawns { get; set; } = 3;
         public int PlayerOPawns { get; set; } = 3;
 
@@ -19,10 +20,10 @@ namespace Tic_Tac_Toe_Web_API.Models
         };
 
 
-        public RotaGame(ResultsRepository resultsRepository)
+        public RotaGame(IResultsRepository resultsRepository = null)
         {
-            Name = "Rota";
             _resultsRepository= resultsRepository;
+            Name = "Rota";
         }
 
         public override async Task SelectMarkAsync(int playerId, Mark mark)

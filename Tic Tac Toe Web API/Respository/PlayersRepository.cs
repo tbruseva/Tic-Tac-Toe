@@ -1,10 +1,11 @@
 ﻿using Tic_Tac_Toe_Web_API.Database_Models;
 using Tic_Tac_Toe_Web_API.Models;
 using Tic_Tac_Toe_Web_API.Models.Interfaces;
+using Tic_Tac_Toe_Web_API.Respository.Interfaces;
 
 namespace Tic_Tac_Toe_Web_API.Respository
 {
-    public class PlayersRepository
+    public class PlayersRepository : IPlayersRepository
     {
         private AppDbContext _dbContext;
 

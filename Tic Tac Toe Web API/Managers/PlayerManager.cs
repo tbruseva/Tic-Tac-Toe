@@ -3,15 +3,16 @@ using Tic_Tac_Toe_Web_API.Models;
 using Tic_Tac_Toe_Web_API.Models.Dtos;
 using Tic_Tac_Toe_Web_API.Models.Mappers;
 using Tic_Tac_Toe_Web_API.Respository;
+using Tic_Tac_Toe_Web_API.Respository.Interfaces;
 
 namespace Tic_Tac_Toe_Web_API.Managers
 {
     public class PlayerManager : IPlayerManager
     {
         private List<Player> players = new List<Player>();
-        private PlayersRepository _playersRepository;
+        private IPlayersRepository _playersRepository;
 
-        public PlayerManager(PlayersRepository playersRepository)
+        public PlayerManager(IPlayersRepository playersRepository)
         {
             _playersRepository = playersRepository;
             players.Add(Player.Computer);

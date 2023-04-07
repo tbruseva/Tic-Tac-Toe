@@ -4,12 +4,13 @@ using Tic_Tac_Toe_Web_API.Database_Models;
 using Tic_Tac_Toe_Web_API.Enums;
 using Tic_Tac_Toe_Web_API.Models.Interfaces;
 using Tic_Tac_Toe_Web_API.Respository;
+using Tic_Tac_Toe_Web_API.Respository.Interfaces;
 
 namespace Tic_Tac_Toe_Web_API.Models
 {
     public class TicTacToeGame : TicTacToe
     {
-        public ResultsRepository _resultsRepository;
+        public IResultsRepository _resultsRepository;
         public override List<List<int>> WinningCombinations { get; set; } = new List<List<int>> {
             new List<int> { 0, 1, 2 },
             new List<int> { 3, 4, 5 },
@@ -21,7 +22,7 @@ namespace Tic_Tac_Toe_Web_API.Models
             new List<int> { 2, 4, 6 }
         };
 
-        public TicTacToeGame(ResultsRepository resultsRepository)
+        public TicTacToeGame(IResultsRepository resultsRepository = null)
         {
             Name = "Tic-Tac-Toe";
             _resultsRepository= resultsRepository;

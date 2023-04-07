@@ -12,10 +12,13 @@ namespace Tic_Tac_Toe_Web_API.Managers
     public class GameManager : IGameManager
     {
         private List<IGame> _allGames = new List<IGame>();
+        private PlayersRepository _playersRepository;
+        private ResultsRepository _resultsRepository;
 
-        public GameManager()
+        public GameManager(PlayersRepository playersRepository, ResultsRepository resultsRepository)
         {
-
+            _playersRepository= playersRepository;
+            _resultsRepository= resultsRepository;
         }
 
         public async Task<List<IGame>> GetAllGamesAsync()
