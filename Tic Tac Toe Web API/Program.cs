@@ -40,6 +40,7 @@ namespace Tic_Tac_Toe_Web_API
             builder.Services.AddScoped<TicTacToeGameMapper>();
             builder.Services.AddScoped<PlayerMapper>();
             builder.Services.AddScoped<RotaGameMapper>();
+            
 
             var app = builder.Build();
 
