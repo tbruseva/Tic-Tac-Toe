@@ -22,7 +22,7 @@ namespace Tic_Tac_Toe_Web_API.Models
             new List<int> { 2, 4, 6 }
         };
 
-        public TicTacToeGame(IResultsRepository resultsRepository = null)
+        public TicTacToeGame(IResultsRepository resultsRepository)
         {
             Name = "Tic-Tac-Toe";
             _resultsRepository= resultsRepository;

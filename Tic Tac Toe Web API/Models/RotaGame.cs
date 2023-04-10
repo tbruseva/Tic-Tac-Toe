@@ -21,7 +21,7 @@ namespace Tic_Tac_Toe_Web_API.Models
         };
 
 
-        public RotaGame(IResultsRepository resultsRepository = null)
+        public RotaGame(IResultsRepository resultsRepository)
         {
             _resultsRepository= resultsRepository;
             Name = "Rota";

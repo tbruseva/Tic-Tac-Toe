@@ -38,7 +38,7 @@ namespace Tic_Tac_Toe_Web_API.Respository
 
         public async Task<ResultDbModel> Update (ResultDbModel result)
         {
-            var existingResult = await GetByPlayerId(result);
+            var existingResult = await Get(result);
             existingResult.Wins++;
             var updatedResult = _dbContext.Update(existingResult);
             await _dbContext.SaveChangesAsync();

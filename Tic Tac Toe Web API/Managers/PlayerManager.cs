@@ -68,7 +68,7 @@ namespace Tic_Tac_Toe_Web_API.Managers
 
             var player = new Player();
             player.Name = username;
-            await _playersRepository.CreatePlearAsync(player);
+            await _playersRepository.Create(player);
 
             return player;
         }
