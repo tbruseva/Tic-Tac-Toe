@@ -10,7 +10,6 @@ namespace Tic_Tac_Toe_Web_API.Database_Models
     {
         [Key]
         public int Id { get; set; }
-        public int PlayerId { get; set; }
         public string Name { get; set; } = null!;
         public ResultDbModel Result { get; set; } = null!;
     }

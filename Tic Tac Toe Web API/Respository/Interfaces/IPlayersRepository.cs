@@ -5,6 +5,8 @@ namespace Tic_Tac_Toe_Web_API.Respository.Interfaces
 {
     public interface IPlayersRepository
     {
-        public Task<PlayerDbModel> Create(Player player);
+        public Task<PlayerDbModel> Get(int id);
+        public Task<PlayerDbModel> Get(string username);
+        public Task<PlayerDbModel> Create(PlayerDbModel player);
     }
 }

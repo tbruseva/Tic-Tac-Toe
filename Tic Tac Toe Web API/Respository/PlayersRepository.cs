@@ -14,10 +14,21 @@ namespace Tic_Tac_Toe_Web_API.Respository
             _dbContext = dbContext;
         }
 
-        public async Task<PlayerDbModel> Create(Player player)
+        public async Task<PlayerDbModel> Get(int id)
         {
-            var playerDb = new PlayerDbModel() { Id = player.Id, Name = player.Name };
-            var createdDbPlayer = await _dbContext.AddAsync(playerDb);
+            var player = _dbContext.Players.Where(p => p.Id == id).FirstOrDefault();
+
+            return player;
+        }
+        public async Task<PlayerDbModel> Get(string username)
+        {
+            var player = _dbContext.Players.Where(p => p.Name == username).FirstOrDefault();
+
+            return player;
+        }
+        public async Task<PlayerDbModel> Create(PlayerDbModel player)
+        {
+            var createdDbPlayer = await _dbContext.AddAsync(player);
             await _dbContext.SaveChangesAsync();
 
             return createdDbPlayer.Entity;

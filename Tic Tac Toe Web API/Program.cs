@@ -30,8 +30,8 @@ namespace Tic_Tac_Toe_Web_API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddSingleton<IGameManager, GameManager>();
-            builder.Services.AddSingleton<IPlayerManager, PlayerManager>();
+            builder.Services.AddScoped<IGameManager, GameManager>();
+            builder.Services.AddScoped<IPlayerManager, PlayerManager>();
             builder.Services.AddSingleton<AppDbContext>();
             builder.Services.AddSingleton<IPlayersRepository, PlayersRepository>();
             builder.Services.AddSingleton<IResultsRepository, ResultsRepository>();
