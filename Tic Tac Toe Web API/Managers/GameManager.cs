@@ -5,16 +5,21 @@ using System.Numerics;
 using Tic_Tac_Toe_Web_API.Models.Dtos;
 using Tic_Tac_Toe_Web_API.Models.Mappers;
 using Tic_Tac_Toe_Web_API.Managers.Interfaces;
+using Tic_Tac_Toe_Web_API.Respository;
+using Tic_Tac_Toe_Web_API.Respository.Interfaces;
 
 namespace Tic_Tac_Toe_Web_API.Managers
 {
     public class GameManager : IGameManager
     {
         private List<IGame> _allGames = new List<IGame>();
+        private IPlayersRepository _playersRepository;
+        private IResultsRepository _resultsRepository;
 
-        public GameManager()
+        public GameManager(IPlayersRepository playersRepository, IResultsRepository resultsRepository)
         {
-
+            _playersRepository= playersRepository;
+            _resultsRepository= resultsRepository;
         }
 
         public async Task<List<IGame>> GetAllGamesAsync()
@@ -41,11 +46,11 @@ namespace Tic_Tac_Toe_Web_API.Managers
 
             if (name == "Tic-Tac-Toe")
             {
-                game = new TicTacToeGame();
+                game = new TicTacToeGame(_resultsRepository);
             }
             else if (name == "Rota")
             {
-                game = new RotaGame();
+                game = new RotaGame(_resultsRepository);
             }
             else
             {

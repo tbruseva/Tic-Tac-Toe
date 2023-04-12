@@ -1,9 +1,13 @@
 ﻿using Tic_Tac_Toe_Web_API.Enums;
+using Tic_Tac_Toe_Web_API.Respository;
+using Tic_Tac_Toe_Web_API.Respository.Interfaces;
 
 namespace Tic_Tac_Toe_Web_API.Models
 {
     public class RotaGame : TicTacToe
     {
+        public IResultsRepository _resultsRepository;
+        public WebApplicationBuilder builder;
         public int PlayerXPawns { get; set; } = 3;
         public int PlayerOPawns { get; set; } = 3;
 
@@ -17,8 +21,9 @@ namespace Tic_Tac_Toe_Web_API.Models
         };
 
 
-        public RotaGame()
+        public RotaGame(IResultsRepository resultsRepository)
         {
+            _resultsRepository= resultsRepository;
             Name = "Rota";
         }
 

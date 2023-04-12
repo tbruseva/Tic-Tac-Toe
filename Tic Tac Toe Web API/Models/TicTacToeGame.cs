@@ -1,9 +1,16 @@
 ﻿
+using Microsoft.AspNetCore.Mvc;
+using Tic_Tac_Toe_Web_API.Database_Models;
 using Tic_Tac_Toe_Web_API.Enums;
+using Tic_Tac_Toe_Web_API.Models.Interfaces;
+using Tic_Tac_Toe_Web_API.Respository;
+using Tic_Tac_Toe_Web_API.Respository.Interfaces;
+
 namespace Tic_Tac_Toe_Web_API.Models
 {
     public class TicTacToeGame : TicTacToe
     {
+        public IResultsRepository _resultsRepository;
         public override List<List<int>> WinningCombinations { get; set; } = new List<List<int>> {
             new List<int> { 0, 1, 2 },
             new List<int> { 3, 4, 5 },
@@ -12,12 +19,13 @@ namespace Tic_Tac_Toe_Web_API.Models
             new List<int> { 1, 4, 7 },
             new List<int> { 2, 5, 8 },
             new List<int> { 0, 4, 8 },
-            new List<int> { 2, 4, 6 } 
+            new List<int> { 2, 4, 6 }
         };
 
-        public TicTacToeGame()
+        public TicTacToeGame(IResultsRepository resultsRepository)
         {
             Name = "Tic-Tac-Toe";
+            _resultsRepository= resultsRepository;
         }
 
         public override async Task SelectMarkAsync(int playerId, Mark mark)
@@ -79,6 +87,7 @@ namespace Tic_Tac_Toe_Web_API.Models
                         GameStatus = GameStatus.Finished;
                         CounterTotalGames++;
                         GameState = 0;
+                        await CreateAndSaveResultDbModel();
                     }
                     else if (!Grid.Contains(Mark.None))
                     {
@@ -132,7 +141,7 @@ namespace Tic_Tac_Toe_Web_API.Models
             }
             return position;
         }
-        
+
 
         private async Task<int> CalculatePositionAsync(int row, int col)
         {
@@ -140,6 +149,29 @@ namespace Tic_Tac_Toe_Web_API.Models
             return position;
         }
 
+        private async Task CreateAndSaveResultDbModel()
+        {
+            var resultToSave = new ResultDbModel();
+            resultToSave.PlayerId = this.Players[this.CurrentPlayerIndex].Id;
+            resultToSave.GameName = this.Name;
+            resultToSave.Wins = 1;
+
+            var existingResult = await _resultsRepository.Get(resultToSave);
+            ResultDbModel savedResult;
+            if (existingResult == null)
+            {
+                savedResult = await _resultsRepository.Create(resultToSave);
+            }
+            else
+            {
+                savedResult = await _resultsRepository.Update(resultToSave);
+            }
+
+            if (savedResult == null)
+            {
+                throw new Exception("Something went wrong with saving the result in the database!");
+            }
+        }
         #endregion
     }
 }

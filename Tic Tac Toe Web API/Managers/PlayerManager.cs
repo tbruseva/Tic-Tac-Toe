@@ -1,57 +1,50 @@
-﻿using Tic_Tac_Toe_Web_API.Managers.Interfaces;
+﻿using Tic_Tac_Toe_Web_API.Database_Models;
+using Tic_Tac_Toe_Web_API.Managers.Interfaces;
 using Tic_Tac_Toe_Web_API.Models;
 using Tic_Tac_Toe_Web_API.Models.Dtos;
 using Tic_Tac_Toe_Web_API.Models.Mappers;
+using Tic_Tac_Toe_Web_API.Respository;
+using Tic_Tac_Toe_Web_API.Respository.Interfaces;
 
 namespace Tic_Tac_Toe_Web_API.Managers
 {
     public class PlayerManager : IPlayerManager
     {
         private List<Player> players = new List<Player>();
-        
+        private IPlayersRepository _playersRepository;
+        private PlayerMapper _mapper;
 
-        public PlayerManager()
+        public PlayerManager(IPlayersRepository playersRepository, PlayerMapper mapper)
         {
+            _playersRepository = playersRepository;
+            _mapper = mapper;
             players.Add(Player.Computer);
-        }
-
-        public async Task<Player> GetPlayerAsync(string username)
-        {
-            foreach (var player in players)
-            {
-                if (player.Name == username)
-                {
-                    return player;
-                }
-            }
-
-            throw new Exception("Player doesn't exist!");
         }
 
         public async Task<Player> GetPlayerAsync(int playerId)
         {
-            foreach (var player in players)
+            var player = await _playersRepository.Get(playerId);
+            if (player == null)
             {
-                if (player.Id == playerId)
-                {
-                    return player;
-                }
+                throw new Exception("Player doesn't exist!");
             }
 
-            throw new Exception("Player doesn't exist!");
+            var playerModel = _mapper.ConvertToPlayer(player);
+
+            return playerModel;
         }
 
-        public async Task<bool> CheckPlayerExistAsync(string username)
+        public async Task<Player> GetPlayerAsync(string username)
         {
-            foreach (var player in players)
+            var playerDbModel = await _playersRepository.Get(username);
+            if (playerDbModel == null)
             {
-                if (player.Name == username)
-                {
-                    return true;
-                }
+                throw new Exception("Player doesn't exist!");
             }
 
-            return false;
+            var player = _mapper.ConvertToPlayer(playerDbModel);
+
+            return player;
         }
 
         public async Task<Player> CreatePlayerAsync(string? username)
@@ -63,14 +56,26 @@ namespace Tic_Tac_Toe_Web_API.Managers
                 throw new InvalidOperationException("User with this username already exist! Please choose another name!");
             }
 
-            var player = new Player();
-            player.Name = username;
-            players.Add(player);
+            var playerDbModel = new PlayerDbModel() { Name = username };
+
+            var createdPlayer = await _playersRepository.Create(playerDbModel);
+            if (createdPlayer == null)
+            {
+                throw new Exception("Something went wrong when saving player in the database!");
+            }
+
+            var player = _mapper.ConvertToPlayer(createdPlayer);
 
             return player;
         }
 
         #region Private methods
+        private async Task<bool> CheckPlayerExistAsync(string username)
+        {
+            var player = await _playersRepository.Get(username);
+
+            return player == null ? false : true;
+        }
         private async Task<string> GenerateUniqueUsernameAsync(string baseUsername)
         {
             int playerIndex = 1;
